@@ -31,30 +31,22 @@ window.addEventListener('DOMContentLoaded', async () => {
     reader.readAsText(file);
   });
 
-  // Task type toggle — show/hide target language
-  document.querySelectorAll('input[name="task"]').forEach((radio) => {
-    radio.addEventListener('change', () => {
-      const isTranslation = radio.value === 'translation';
-      document.getElementById('targetLangField').style.display = isTranslation ? '' : 'none';
-    });
-  });
-
   // Submit
   document.getElementById('submitBtn').addEventListener('click', handleSubmit);
 });
 
 async function handleSubmit() {
   const keyJson = document.getElementById('keyTextarea').value.trim();
-  const task = document.querySelector('input[name="task"]:checked').value;
   const sourceLang = document.getElementById('sourceLang').value;
   const targetLang = document.getElementById('targetLang').value;
   const inputText = document.getElementById('inputText').value.trim();
 
   // Validation
   if (!keyJson) return showError('Vertex AI JSON 키를 입력해주세요.');
-  if (!sourceLang) return showError('출발 언어를 입력해주세요.');
-  if (task === 'translation' && !targetLang) return showError('도착 언어를 입력해주세요.');
   if (!inputText) return showError('입력 내용을 작성해주세요.');
+
+  // Determine task by language selection
+  const task = sourceLang === targetLang ? 'grammar' : 'translation';
 
   // Build prompt
   const basePrompt = prompts[task] || '';
