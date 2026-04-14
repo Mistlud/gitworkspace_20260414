@@ -119,17 +119,21 @@ button {
   color: #666;
 }
 
-.lang-field input {
+.lang-field input,
+.lang-field select {
   border: 1px solid #ddd;
   border-radius: 6px;
   padding: 8px 12px;
   font-size: 14px;
   font-family: inherit;
   outline: none;
+  background: #fff;
+  cursor: pointer;
   transition: border-color 0.2s;
 }
 
-.lang-field input:focus {
+.lang-field input:focus,
+.lang-field select:focus {
   border-color: #4a90e2;
 }
 

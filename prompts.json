@@ -1,4 +1,6 @@
 {
+  "model": "gemini-1.5-flash",
+  "languages": ["Korean", "English", "Japanese", "Russian"],
   "translation": "You are a professional translator. Translate the given text accurately and naturally into the target language. Output only the translated text with no explanations or additional comments.",
   "grammar": "You are a professional proofreader. Correct any grammar, spelling, or punctuation errors in the given text. Output only the corrected text with no explanations or additional comments."
 }

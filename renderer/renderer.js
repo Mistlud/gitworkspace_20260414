@@ -3,6 +3,18 @@ let prompts = {};
 window.addEventListener('DOMContentLoaded', async () => {
   prompts = await window.api.getPrompts();
 
+  // Populate language dropdowns
+  const languages = prompts.languages || [];
+  ['sourceLang', 'targetLang'].forEach((id) => {
+    const select = document.getElementById(id);
+    languages.forEach((lang) => {
+      const option = document.createElement('option');
+      option.value = lang;
+      option.textContent = lang;
+      select.appendChild(option);
+    });
+  });
+
   // File load button
   document.getElementById('loadFileBtn').addEventListener('click', () => {
     document.getElementById('fileInput').click();
@@ -34,8 +46,8 @@ window.addEventListener('DOMContentLoaded', async () => {
 async function handleSubmit() {
   const keyJson = document.getElementById('keyTextarea').value.trim();
   const task = document.querySelector('input[name="task"]:checked').value;
-  const sourceLang = document.getElementById('sourceLang').value.trim();
-  const targetLang = document.getElementById('targetLang').value.trim();
+  const sourceLang = document.getElementById('sourceLang').value;
+  const targetLang = document.getElementById('targetLang').value;
   const inputText = document.getElementById('inputText').value.trim();
 
   // Validation

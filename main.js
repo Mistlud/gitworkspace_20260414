@@ -41,7 +41,9 @@ ipcMain.handle('send-to-vertex', async (event, { keyJson, prompt }) => {
     const accessToken = tokenResponse.token;
 
     const projectId = credentials.project_id;
-    const model = 'gemini-1.5-flash';
+    const promptsPath = path.join(__dirname, 'prompts.json');
+    const promptsData = JSON.parse(fs.readFileSync(promptsPath, 'utf-8'));
+    const model = promptsData.model || 'gemini-1.5-flash';
     const location = 'us-central1';
 
     const url = `https://${location}-aiplatform.googleapis.com/v1/projects/${projectId}/locations/${location}/publishers/google/models/${model}:generateContent`;
