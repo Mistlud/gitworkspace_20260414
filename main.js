@@ -5,8 +5,9 @@ const { GoogleAuth } = require('google-auth-library');
 
 function createWindow() {
   const win = new BrowserWindow({
-    width: 800,
-    height: 700,
+    width: 900,
+    height: 640,
+    frame: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
@@ -77,6 +78,12 @@ ipcMain.handle('send-to-vertex', async (event, { keyJson, prompt }) => {
   } catch (err) {
     return { success: false, error: err.message };
   }
+});
+
+// Close window
+ipcMain.on('close-window', (event) => {
+  const win = BrowserWindow.fromWebContents(event.sender);
+  if (win) win.close();
 });
 
 // Load prompts
