@@ -19,11 +19,16 @@
 - `prompts.json` 초안 작성 (번역 / 문법 교정 프롬프트)
 - GitHub 푸시 완료
 
+### 기능 추가 (2026-04-14)
+- `prompts.json`에 `model` 필드 추가 — 관리자가 파일 수정만으로 모델 변경 가능
+- `prompts.json`에 `languages` 필드 추가 (Korean, English, Japanese, Russian)
+- 언어 선택 UI를 텍스트 입력에서 드롭다운으로 교체
+- 드롭다운 옵션을 `prompts.json`에서 동적으로 로드하도록 구현
+
 ---
 
 ## Pending
 
-- 언어 선택 기능 세부 논의 및 구현 (예: 드롭다운 옵션 등)
 - 프롬프트 내용 검토 및 개선
 - 실제 Vertex AI 키로 동작 테스트
 - 기타 기능 논의 예정
