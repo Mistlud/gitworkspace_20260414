@@ -1,0 +1,15 @@
+{
+  "name": "llm-translation-app",
+  "version": "1.0.0",
+  "description": "Desktop app for translation and grammar correction via Vertex AI",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron ."
+  },
+  "dependencies": {
+    "google-auth-library": "^9.0.0"
+  },
+  "devDependencies": {
+    "electron": "^29.0.0"
+  }
+}

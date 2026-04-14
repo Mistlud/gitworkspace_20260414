@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'">
+  <title>LLM Translation & Grammar Correction</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <div class="container">
+    <h1>번역 / 문법 교정</h1>
+
+    <!-- JSON Key Input -->
+    <section class="card">
+      <label class="section-label">Vertex AI JSON 키</label>
+      <div class="key-input-row">
+        <button id="loadFileBtn">파일 불러오기</button>
+        <span id="fileStatus" class="file-status">선택된 파일 없음</span>
+        <input type="file" id="fileInput" accept=".json" style="display:none" />
+      </div>
+      <textarea id="keyTextarea" placeholder="또는 JSON 내용을 여기에 붙여넣으세요..." rows="4"></textarea>
+    </section>
+
+    <!-- Task Type -->
+    <section class="card">
+      <label class="section-label">작업 유형</label>
+      <div class="radio-group">
+        <label><input type="radio" name="task" value="translation" checked /> 번역</label>
+        <label><input type="radio" name="task" value="grammar" /> 문법 교정</label>
+      </div>
+    </section>
+
+    <!-- Language Selection -->
+    <section class="card">
+      <label class="section-label">언어 설정</label>
+      <div class="lang-row">
+        <div class="lang-field">
+          <label>출발 언어</label>
+          <input type="text" id="sourceLang" placeholder="예: 한국어" />
+        </div>
+        <div class="lang-field" id="targetLangField">
+          <label>도착 언어</label>
+          <input type="text" id="targetLang" placeholder="예: 영어" />
+        </div>
+      </div>
+    </section>
+
+    <!-- Input Text -->
+    <section class="card">
+      <label class="section-label">입력 내용</label>
+      <textarea id="inputText" placeholder="처리할 문장을 입력하세요..." rows="5"></textarea>
+    </section>
+
+    <button id="submitBtn" class="submit-btn">전송</button>
+
+    <!-- Result -->
+    <section class="card result-card" id="resultCard" style="display:none">
+      <label class="section-label">결과</label>
+      <div id="resultText" class="result-text"></div>
+    </section>
+
+    <div id="errorMsg" class="error-msg" style="display:none"></div>
+  </div>
+
+  <script src="renderer.js"></script>
+</body>
+</html>
