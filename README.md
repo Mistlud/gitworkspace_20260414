@@ -31,9 +31,10 @@ gitworkspace_20260414/
 ```json
 {
   "model": "gemini-3-flash-preview",
-  "languages": ["Korean", "English", "Japanese", "Russian"],
   "thinking_level": "MINIMAL",
   "temperature": 0.1,
+  "max_output_tokens": 2048,
+  "languages": ["Korean", "English", "Japanese", "Russian", "French"],
   "translation": "번역 시 사용할 프롬프트",
   "grammar": "문법 교정 시 사용할 프롬프트"
 }
@@ -42,9 +43,10 @@ gitworkspace_20260414/
 | 필드 | 설명 |
 |---|---|
 | `model` | 사용할 Gemini 모델명 |
-| `languages` | 드롭다운에 표시할 언어 목록 |
-| `thinking_level` | Gemini thinking 수준 (`MINIMAL` / `NONE` 등) |
+| `thinking_level` | Gemini thinking 수준 — Flash: `MINIMAL` 고정 / Pro: 생략(API 기본값 HIGH) |
 | `temperature` | 생성 온도 (0.0 ~ 1.0) |
+| `max_output_tokens` | 최대 출력 토큰 수 (256 ~ 8192) |
+| `languages` | 드롭다운에 표시할 언어 목록 (Korean, English는 고정) |
 | `translation` | 번역 작업용 시스템 프롬프트 |
 | `grammar` | 문법 교정 작업용 시스템 프롬프트 |
 
@@ -53,7 +55,7 @@ gitworkspace_20260414/
 | 탭 | 내용 |
 |---|---|
 | 번역 | 언어 선택 + 텍스트 입력/결과 화면 |
-| 설정 | Vertex AI JSON 키 입력, 저장 및 삭제 |
+| 설정 | JSON 키 / 모델 / Max Output Tokens / 언어 목록 관리 |
 | 기타 | 미정 |
 
 ## 작동 방식

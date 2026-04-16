@@ -58,6 +58,19 @@
 - 입력창 우하단에 지우기 버튼 추가 (출력창은 건드리지 않음)
 - 닫기 버튼 클릭 시 커스텀 스타일 확인 모달 표시 (네이티브 `confirm()` 대체)
 
+### 설정 탭 확장 (2026-04-16)
+- 언어 목록 관리 UI 추가
+  - 언어 추가 / 삭제 가능 (Korean, English는 고정 — 삭제 불가)
+  - 변경 시 `prompts.json` 즉시 저장 및 번역 탭 드롭다운 동기화
+- 모델 선택 UI 추가 (드롭다운)
+  - Flash 선택 → `thinking_level: "MINIMAL"` 자동 적용
+  - Pro 선택 → `thinking_level` 필드 제거 (API 기본값 HIGH)
+- Max Output Tokens 입력 UI 추가 (범위: 256 ~ 8192)
+  - `prompts.json`의 `max_output_tokens` 필드와 연동
+  - `main.js` 하드코딩 제거
+- `save-prompts` IPC 핸들러 추가
+- 설정 탭 반응형 처리 (창 크기 변경 시 레이아웃 대응)
+
 ---
 
 ## Pending
@@ -71,15 +84,6 @@
   - 방안: `prompts.json`의 `languages` 필드를 `{ value, label }` 구조로 변경
 - 사용자 안내 문구 추가 (출발어=도착어 → 교정, 다르면 → 번역 자동 적용 설명)
 
-### Phase 3 — 설정 탭 확장
-- 언어쌍 관리 UI
-  - `prompts.json`의 `languages` 목록을 앱 내에서 추가/삭제 가능하도록 구현
-- 사용 모델 관리 UI
-  - 현재 적용된 모델명 표시 및 변경 입력 필드 제공
-- Max Output Tokens 관리 UI
-  - 숫자 입력 필드로 `max_output_tokens` 값 조정
-- 위 설정 변경 시 `prompts.json`에 즉시 반영 (IPC 경유)
-
 ### Phase 4 — 기능 확장
 - 탭 3 용도 결정 (후보: 히스토리, 프롬프트 미리보기 등)
 - 프롬프트 내용 검토 및 개선
@@ -89,10 +93,11 @@
 ## 참고 사항
 
 ### 현재 모델 및 설정
-- 모델: `gemini-3-flash-preview` (`prompts.json`에서 변경 가능)
+- 모델: `gemini-3-flash-preview` 또는 `gemini-3.1-pro-preview` (설정 탭에서 변경)
 - location: `global` 고정 (Gemini 3.x 전용)
-- thinking_level: `MINIMAL` (Flash 지원, 번역/교정 단순 작업에 적합)
+- thinking_level: Flash → `MINIMAL` 고정 / Pro → API 기본값(HIGH)
 - temperature: `0.1`
+- max_output_tokens: `2048` (설정 탭에서 변경 가능)
 
 ### JSON 키 저장 위치
 - `%APPDATA%/llm-translation-app/saved-key.bin`

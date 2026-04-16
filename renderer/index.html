@@ -84,11 +84,33 @@
           </div>
 
           <div class="settings-section">
+            <div class="model-tokens-row">
+              <div class="model-tokens-field">
+                <label class="settings-label">모델</label>
+                <select id="modelSelect" class="model-select">
+                  <option value="gemini-3-flash-preview">Flash — gemini-3-flash-preview</option>
+                  <option value="gemini-3.1-pro-preview">Pro — gemini-3.1-pro-preview</option>
+                </select>
+              </div>
+              <div class="model-tokens-field tokens-field-fixed">
+                <label class="settings-label">Max Output Tokens</label>
+                <div class="tokens-row">
+                  <input type="number" id="maxTokensInput" class="tokens-input" min="256" max="8192" step="256" />
+                  <button id="maxTokensSaveBtn" class="tokens-save-btn">저장</button>
+                </div>
+              </div>
+            </div>
+            <div id="tokensFeedback" class="key-feedback" style="display:none"></div>
+          </div>
+
+          <div class="settings-section">
             <label class="settings-label">언어 목록</label>
-            <div id="langList" class="lang-list"></div>
-            <div class="lang-add-row">
-              <input type="text" id="langInput" placeholder="언어명 입력 (예: Spanish)" maxlength="40" />
-              <button id="langAddBtn">추가</button>
+            <div class="lang-box">
+              <div id="langList" class="lang-list"></div>
+              <div class="lang-add-row">
+                <input type="text" id="langInput" placeholder="언어명 입력 (예: Spanish)" maxlength="40" />
+                <button id="langAddBtn">추가</button>
+              </div>
             </div>
             <div id="langFeedback" class="key-feedback" style="display:none"></div>
           </div>

@@ -105,7 +105,7 @@ ipcMain.handle('send-to-vertex', async (event, { keyJson, systemPrompt, userMess
       ],
       generation_config: {
         temperature: promptsData.temperature ?? 0.1,
-        max_output_tokens: 2048,
+        max_output_tokens: promptsData.max_output_tokens ?? 2048,
         ...(promptsData.thinking_level && {
           thinking_config: { thinking_level: promptsData.thinking_level }
         })

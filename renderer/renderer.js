@@ -91,6 +91,41 @@ window.addEventListener('DOMContentLoaded', async () => {
     updateKeyUI({ exists: false });
   });
 
+  // Max output tokens
+  const maxTokensInput = document.getElementById('maxTokensInput');
+  maxTokensInput.value = prompts.max_output_tokens ?? 2048;
+
+  document.getElementById('maxTokensSaveBtn').addEventListener('click', async () => {
+    const val = parseInt(maxTokensInput.value, 10);
+    const feedback = document.getElementById('tokensFeedback');
+    if (isNaN(val) || val < 256 || val > 8192) {
+      feedback.textContent = '✗ 256 ~ 8192 사이의 값을 입력해주세요.';
+      feedback.className = 'key-feedback error';
+      feedback.style.display = '';
+      return;
+    }
+    prompts.max_output_tokens = val;
+    await window.api.savePrompts(prompts);
+    feedback.textContent = `✓ ${val} 토큰으로 저장됨`;
+    feedback.className = 'key-feedback ok';
+    feedback.style.display = '';
+    setTimeout(() => { feedback.style.display = 'none'; }, 2500);
+  });
+
+  // Model selection
+  const modelSelect = document.getElementById('modelSelect');
+  modelSelect.value = prompts.model || 'gemini-3-flash-preview';
+  modelSelect.addEventListener('change', async () => {
+    const selected = modelSelect.value;
+    prompts.model = selected;
+    if (selected === 'gemini-3-flash-preview') {
+      prompts.thinking_level = 'MINIMAL';
+    } else {
+      delete prompts.thinking_level;
+    }
+    await window.api.savePrompts(prompts);
+  });
+
   // Language management
   renderLangList();
 
