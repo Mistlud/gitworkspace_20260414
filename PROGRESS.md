@@ -36,27 +36,56 @@
 - 결과창 복사 버튼 배치
 - 사용하지 않는 `.radio-group` CSS 제거
 
+### Vertex AI 연동 수정 (2026-04-16)
+- 엔드포인트 URL 수정: `https://global-aiplatform.googleapis.com/...` → `https://aiplatform.googleapis.com/...`
+  - Gemini 3.x는 `global` location 전용이나 URL 앞에 붙이지 않음
+- 요청 구조 개선: 시스템 프롬프트를 `system_instruction` 필드로 분리
+- `generation_config` 추가: `temperature`, `max_output_tokens`, `thinking_config`
+- 모델 업데이트: `gemini-1.5-flash` → `gemini-3-flash-preview`
+- `prompts.json`에 `thinking_level: "MINIMAL"`, `temperature: 0.1` 필드 추가
+- 에러 처리 순서 수정: `response.ok` 먼저 확인 → 실패 시 `.text()`로 메시지 출력
+- **번역 / 문법 교정 정상 동작 확인 완료**
+
+### 설정 탭 — JSON 키 영구 저장 (2026-04-16)
+- `electron.safeStorage`로 키 암호화 저장 (`userData/saved-key.bin`, DPAPI 기반)
+- IPC 핸들러 추가: `save-key`, `load-key`, `delete-key`
+- 저장된 키 있을 때: `project_id` 표시 + 삭제 버튼 (키 원문은 화면에 노출하지 않음)
+- 저장된 키 없을 때: 파일 불러오기 / 텍스트 입력 + 저장 버튼
+- 유효성 검사 통과 후에만 저장 버튼 표시
+- 앱 재시작 시 저장된 키 자동 복원
+
+### UX 개선 (2026-04-16)
+- 입력창 우하단에 지우기 버튼 추가 (출력창은 건드리지 않음)
+- 닫기 버튼 클릭 시 커스텀 스타일 확인 모달 표시 (네이티브 `confirm()` 대체)
+
 ---
 
 ## Pending
 
-### UI 개선
-- 언어 드롭다운 한국어 표시 검토 (현재 영문 표기 유지 중)
+### Phase 2 — UX 개선
+- 언어 드롭다운 한국어 표시 검토
+  - 방안: `prompts.json`의 `languages` 필드를 `{ value, label }` 구조로 변경
+- 번역 탭에서 키 준비 여부 표시
+  - 키 미설정 상태에서 전송 시 에러로만 안내됨 → 컨트롤 바에 키 상태 인디케이터 추가 검토
 - 사용자 안내 문구 추가 (출발어=도착어 → 교정, 다르면 → 번역 자동 적용 설명)
 
-### 기타
+### Phase 3 — 기능 확장
+- 탭 3 용도 결정 (후보: 히스토리, 프롬프트 미리보기, 모델 변경 UI 등)
 - 프롬프트 내용 검토 및 개선
-- 실제 Vertex AI 키로 동작 테스트
 
 ---
 
 ## 참고 사항
 
-### JSON 키 휘발성
-앱을 껐다 켜면 설정 탭의 JSON 키가 초기화됨. 세션 내에서는 유지되나 영구 저장 미구현. 보안상 민감한 정보이므로 저장 방식은 추후 별도 논의 필요.
+### 현재 모델 및 설정
+- 모델: `gemini-3-flash-preview` (`prompts.json`에서 변경 가능)
+- location: `global` 고정 (Gemini 3.x 전용)
+- thinking_level: `MINIMAL` (Flash 지원, 번역/교정 단순 작업에 적합)
+- temperature: `0.1`
 
-### 번역 탭에서 키 준비 여부 미표시
-키가 설정되지 않은 상태에서 전송 시 에러 메시지로만 안내됨. 번역 탭에서 키 준비 여부를 미리 표시하는 개선 가능.
+### JSON 키 저장 위치
+- `%APPDATA%/llm-translation-app/saved-key.bin`
+- Windows DPAPI로 암호화됨 — 다른 PC에서는 복호화 불가
 
 ### 기본 언어 선택
-앱 실행 시 출발어 Korean, 도착어 English로 자동 설정됨. 주 사용 패턴에 따라 기본값 변경 가능.
+- 앱 실행 시 출발어 Korean, 도착어 English로 자동 설정됨
