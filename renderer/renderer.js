@@ -1,8 +1,12 @@
 let prompts = {};
-let savedKeyJson = '';
+let hasSavedKey = false;
 
 window.addEventListener('DOMContentLoaded', async () => {
   prompts = await window.api.getPrompts();
+
+  // Check for saved key
+  const keyState = await window.api.loadKey();
+  updateKeyUI(keyState);
 
   // Populate language dropdowns
   const languages = prompts.languages || [];
@@ -39,7 +43,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   // Close button
   document.getElementById('closeBtn').addEventListener('click', () => {
-    window.api.closeWindow();
+    showConfirmModal(() => window.api.closeWindow());
   });
 
   // File load button (settings tab)
@@ -64,8 +68,34 @@ window.addEventListener('DOMContentLoaded', async () => {
     validateKey(e.target.value.trim());
   });
 
+  // Save key button
+  document.getElementById('saveKeyBtn').addEventListener('click', async () => {
+    const keyJson = document.getElementById('keyTextarea').value.trim();
+    if (!keyJson) return;
+    const result = await window.api.saveKey(keyJson);
+    if (result.success) {
+      updateKeyUI({ exists: true, projectId: result.projectId });
+    } else {
+      const feedback = document.getElementById('keyFeedback');
+      feedback.textContent = `✗ 저장 실패: ${result.error}`;
+      feedback.className = 'key-feedback error';
+      feedback.style.display = '';
+    }
+  });
+
+  // Delete key button
+  document.getElementById('deleteKeyBtn').addEventListener('click', async () => {
+    await window.api.deleteKey();
+    updateKeyUI({ exists: false });
+  });
+
   // Submit
   document.getElementById('submitBtn').addEventListener('click', handleSubmit);
+
+  // Clear input button
+  document.getElementById('clearInputBtn').addEventListener('click', () => {
+    document.getElementById('inputText').value = '';
+  });
 
   // Copy button
   document.getElementById('copyBtn').addEventListener('click', () => {
@@ -93,8 +123,10 @@ function updateModeBadge() {
 
 function validateKey(raw) {
   const feedback = document.getElementById('keyFeedback');
+  const saveBtn = document.getElementById('saveKeyBtn');
   if (!raw) {
     feedback.style.display = 'none';
+    saveBtn.style.display = 'none';
     return;
   }
   try {
@@ -102,22 +134,41 @@ function validateKey(raw) {
     if (!parsed.project_id || !parsed.client_email) {
       throw new Error('필수 필드 누락 (project_id, client_email)');
     }
-    savedKeyJson = raw;
     feedback.textContent = '✓ JSON 키가 유효합니다.';
     feedback.className = 'key-feedback ok';
     feedback.style.display = '';
+    saveBtn.style.display = '';
   } catch (err) {
-    savedKeyJson = '';
     feedback.textContent = `✗ 유효하지 않은 JSON: ${err.message}`;
     feedback.className = 'key-feedback error';
     feedback.style.display = '';
+    saveBtn.style.display = 'none';
+  }
+}
+
+function updateKeyUI(state) {
+  hasSavedKey = state.exists;
+  const savedDisplay = document.getElementById('savedKeyDisplay');
+  const inputArea = document.getElementById('keyInputArea');
+
+  if (state.exists) {
+    document.getElementById('savedProjectId').textContent = state.projectId;
+    savedDisplay.style.display = '';
+    inputArea.style.display = 'none';
+  } else {
+    savedDisplay.style.display = 'none';
+    inputArea.style.display = '';
+    // Reset input area
+    document.getElementById('keyTextarea').value = '';
+    document.getElementById('fileStatus').textContent = '선택된 파일 없음';
+    document.getElementById('keyFeedback').style.display = 'none';
+    document.getElementById('saveKeyBtn').style.display = 'none';
   }
 }
 
 async function handleSubmit() {
-  // Get key from settings tab
-  const keyJson = document.getElementById('keyTextarea').value.trim();
-  if (!keyJson) return showError('설정 탭에서 Vertex AI JSON 키를 먼저 입력해주세요.');
+  const keyJson = hasSavedKey ? '' : document.getElementById('keyTextarea').value.trim();
+  if (!hasSavedKey && !keyJson) return showError('설정 탭에서 Vertex AI JSON 키를 먼저 입력해주세요.');
 
   const sourceLang = document.getElementById('sourceLang').value;
   const targetLang = document.getElementById('targetLang').value;
@@ -126,17 +177,17 @@ async function handleSubmit() {
   if (!inputText) return showError('텍스트를 입력해주세요.');
 
   const task = sourceLang === targetLang ? 'grammar' : 'translation';
-  const basePrompt = prompts[task] || '';
+  const systemPrompt = prompts[task] || '';
   const langInfo = task === 'translation'
     ? `Source language: ${sourceLang}\nTarget language: ${targetLang}`
     : `Language: ${sourceLang}`;
-  const fullPrompt = `${basePrompt}\n\n${langInfo}\n\nText:\n${inputText}`;
+  const userMessage = `${langInfo}\n\nText:\n${inputText}`;
 
   showError('');
   clearResult();
   setLoading(true);
 
-  const response = await window.api.sendToVertex({ keyJson, prompt: fullPrompt });
+  const response = await window.api.sendToVertex({ keyJson, systemPrompt, userMessage });
 
   setLoading(false);
 
@@ -163,6 +214,28 @@ function showResult(text) {
 function clearResult() {
   document.getElementById('resultText').textContent = '';
   document.getElementById('copyBtn').style.display = 'none';
+}
+
+function showConfirmModal(onConfirm) {
+  const modal = document.getElementById('confirmModal');
+  modal.style.display = 'flex';
+  const confirmBtn = document.getElementById('modalConfirm');
+  const cancelBtn = document.getElementById('modalCancel');
+
+  function cleanup() {
+    modal.style.display = 'none';
+    confirmBtn.replaceWith(confirmBtn.cloneNode(true));
+    cancelBtn.replaceWith(cancelBtn.cloneNode(true));
+  }
+
+  document.getElementById('modalConfirm').addEventListener('click', () => {
+    cleanup();
+    onConfirm();
+  }, { once: true });
+
+  document.getElementById('modalCancel').addEventListener('click', () => {
+    cleanup();
+  }, { once: true });
 }
 
 function showError(msg) {

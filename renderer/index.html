@@ -44,6 +44,7 @@
         <div class="panels">
           <div class="panel">
             <textarea id="inputText" placeholder="텍스트를 입력하세요..."></textarea>
+            <button class="clear-btn" id="clearInputBtn">지우기</button>
           </div>
           <div class="panel result-panel">
             <div id="resultText" class="result-text"></div>
@@ -59,13 +60,27 @@
           <h2>Vertex AI 설정</h2>
           <div class="settings-section">
             <label class="settings-label">JSON 키</label>
-            <div class="key-input-row">
-              <button id="loadFileBtn">파일 불러오기</button>
-              <span id="fileStatus" class="file-status">선택된 파일 없음</span>
-              <input type="file" id="fileInput" accept=".json" style="display:none" />
+
+            <!-- 저장된 키가 있을 때 -->
+            <div id="savedKeyDisplay" style="display:none">
+              <div class="saved-key-info">
+                <span class="saved-key-icon">✓</span>
+                <span>저장된 키: <strong id="savedProjectId"></strong></span>
+              </div>
+              <button id="deleteKeyBtn" class="delete-key-btn">삭제</button>
             </div>
-            <textarea id="keyTextarea" placeholder="또는 JSON 내용을 여기에 붙여넣으세요..." rows="6"></textarea>
-            <div id="keyFeedback" class="key-feedback" style="display:none"></div>
+
+            <!-- 키 입력 영역 (저장된 키 없을 때) -->
+            <div id="keyInputArea">
+              <div class="key-input-row">
+                <button id="loadFileBtn">파일 불러오기</button>
+                <span id="fileStatus" class="file-status">선택된 파일 없음</span>
+                <input type="file" id="fileInput" accept=".json" style="display:none" />
+              </div>
+              <textarea id="keyTextarea" placeholder="또는 JSON 내용을 여기에 붙여넣으세요..." rows="6"></textarea>
+              <div id="keyFeedback" class="key-feedback" style="display:none"></div>
+              <button id="saveKeyBtn" class="save-key-btn" style="display:none">저장</button>
+            </div>
           </div>
         </div>
       </div>
@@ -78,6 +93,17 @@
       </div>
 
     </main>
+  </div>
+
+  <!-- Confirm Modal -->
+  <div id="confirmModal" class="modal-overlay" style="display:none">
+    <div class="modal">
+      <p class="modal-message">종료하시겠습니까?</p>
+      <div class="modal-actions">
+        <button id="modalCancel">취소</button>
+        <button id="modalConfirm" class="modal-confirm">종료</button>
+      </div>
+    </div>
   </div>
 
   <script src="renderer.js"></script>
