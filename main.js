@@ -4,11 +4,31 @@ const fs = require('fs');
 const { GoogleAuth } = require('google-auth-library');
 
 const keyFilePath = () => path.join(app.getPath('userData'), 'saved-key.bin');
+const windowStatePath = () => path.join(app.getPath('userData'), 'window-state.json');
+
+function loadWindowState() {
+  try {
+    const p = windowStatePath();
+    if (fs.existsSync(p)) return JSON.parse(fs.readFileSync(p, 'utf-8'));
+  } catch {}
+  return { width: 900, height: 640 };
+}
+
+function saveWindowState(win) {
+  try {
+    if (win.isMaximized() || win.isMinimized()) return;
+    const bounds = win.getBounds();
+    fs.writeFileSync(windowStatePath(), JSON.stringify(bounds), 'utf-8');
+  } catch {}
+}
 
 function createWindow() {
+  const state = loadWindowState();
   const win = new BrowserWindow({
-    width: 900,
-    height: 640,
+    width: state.width,
+    height: state.height,
+    ...(state.x !== undefined && { x: state.x }),
+    ...(state.y !== undefined && { y: state.y }),
     frame: false,
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
@@ -17,6 +37,14 @@ function createWindow() {
     }
   });
   win.loadFile(path.join(__dirname, 'renderer', 'index.html'));
+
+  let saveTimer;
+  const debouncedSave = () => {
+    clearTimeout(saveTimer);
+    saveTimer = setTimeout(() => saveWindowState(win), 500);
+  };
+  win.on('resize', debouncedSave);
+  win.on('move', debouncedSave);
 }
 
 app.whenReady().then(createWindow);
