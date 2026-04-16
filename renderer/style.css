@@ -289,6 +289,21 @@ textarea#inputText {
 /* ── Tab 2: Settings ── */
 #tab-settings {
   overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #3a3a60 transparent;
+}
+
+#tab-settings::-webkit-scrollbar {
+  width: 4px;
+}
+
+#tab-settings::-webkit-scrollbar-thumb {
+  background: #3a3a60;
+  border-radius: 2px;
+}
+
+#tab-settings::-webkit-scrollbar-track {
+  background: transparent;
 }
 
 .settings-wrap {
@@ -558,6 +573,37 @@ textarea#inputText {
 
 .tokens-save-btn:hover {
   background: #3a5a8a;
+}
+
+/* ── Prompt Editor ── */
+.prompt-edit-row {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+}
+
+.prompt-edit-row textarea {
+  flex: 1;
+  resize: none;
+}
+
+.prompt-save-btn {
+  align-self: stretch;
+  padding: 7px 16px;
+  background: #3a2e5a;
+  border: none;
+  border-radius: 6px;
+  color: #b07ef7;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s;
+  white-space: nowrap;
+}
+
+.prompt-save-btn:hover {
+  background: #4a3a70;
 }
 
 /* ── Model Select ── */

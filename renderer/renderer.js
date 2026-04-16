@@ -91,6 +91,22 @@ window.addEventListener('DOMContentLoaded', async () => {
     updateKeyUI({ exists: false });
   });
 
+  // Prompt editors
+  document.getElementById('translationPrompt').value = prompts.translation || '';
+  document.getElementById('grammarPrompt').value = prompts.grammar || '';
+
+  document.getElementById('saveTranslationBtn').addEventListener('click', async () => {
+    prompts.translation = document.getElementById('translationPrompt').value;
+    await window.api.savePrompts(prompts);
+    showPromptFeedback('translationFeedback');
+  });
+
+  document.getElementById('saveGrammarBtn').addEventListener('click', async () => {
+    prompts.grammar = document.getElementById('grammarPrompt').value;
+    await window.api.savePrompts(prompts);
+    showPromptFeedback('grammarFeedback');
+  });
+
   // Max output tokens
   const maxTokensInput = document.getElementById('maxTokensInput');
   maxTokensInput.value = prompts.max_output_tokens ?? 2048;
@@ -300,6 +316,14 @@ function showError(msg) {
   } else {
     el.style.display = 'none';
   }
+}
+
+function showPromptFeedback(id) {
+  const el = document.getElementById(id);
+  el.textContent = '✓ 저장됨';
+  el.className = 'key-feedback ok';
+  el.style.display = '';
+  setTimeout(() => { el.style.display = 'none'; }, 2500);
 }
 
 function renderLangList() {

@@ -55,7 +55,7 @@ gitworkspace_20260414/
 | 탭 | 내용 |
 |---|---|
 | 번역 | 언어 선택 + 텍스트 입력/결과 화면 |
-| 설정 | JSON 키 / 모델 / Max Output Tokens / 언어 목록 관리 |
+| 설정 | JSON 키 / 모델 / Max Output Tokens / 언어 목록 / 프롬프트 편집 |
 | 기타 | 미정 |
 
 ## 작동 방식
