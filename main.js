@@ -118,7 +118,8 @@ ipcMain.handle('send-to-vertex', async (event, { keyJson, systemPrompt, userMess
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify(body)
+      body: JSON.stringify(body),
+      signal: AbortSignal.timeout(30000)
     });
 
     if (!response.ok) {
@@ -132,7 +133,11 @@ ipcMain.handle('send-to-vertex', async (event, { keyJson, systemPrompt, userMess
 
     return { success: true, result: text };
   } catch (err) {
-    return { success: false, error: err.message };
+    const isTimeout = err.name === 'TimeoutError' || err.name === 'AbortError';
+    const message = isTimeout
+      ? '요청 시간이 초과됐습니다 (30초). 네트워크 상태를 확인하고 다시 시도해주세요.'
+      : err.message;
+    return { success: false, error: message, isTimeout };
   }
 });
 

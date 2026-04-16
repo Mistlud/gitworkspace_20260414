@@ -277,13 +277,39 @@ textarea#inputText {
   color: #fff;
 }
 
-.error-msg {
+.error-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
   padding: 8px 16px;
   background: #3a1a1a;
   border-top: 1px solid #7a2a2a;
+  flex-shrink: 0;
+}
+
+.error-msg {
   color: #f08080;
   font-size: 13px;
-  flex-shrink: 0;
+  flex: 1;
+}
+
+.retry-btn {
+  padding: 4px 14px;
+  background: transparent;
+  border: 1px solid #f08080;
+  border-radius: 5px;
+  color: #f08080;
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.15s, color 0.15s;
+}
+
+.retry-btn:hover {
+  background: #f08080;
+  color: #1e1e2e;
 }
 
 /* ── Tab 2: Settings ── */

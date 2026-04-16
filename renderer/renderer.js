@@ -161,6 +161,7 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   // Submit
   document.getElementById('submitBtn').addEventListener('click', handleSubmit);
+  document.getElementById('retryBtn').addEventListener('click', handleSubmit);
 
   // Clear input button
   document.getElementById('clearInputBtn').addEventListener('click', () => {
@@ -262,9 +263,10 @@ async function handleSubmit() {
   setLoading(false);
 
   if (response.success) {
+    showError('');
     showResult(response.result);
   } else {
-    showError(`오류: ${response.error}`);
+    showError(`오류: ${response.error}`, true);
   }
 }
 
@@ -308,13 +310,17 @@ function showConfirmModal(onConfirm) {
   }, { once: true });
 }
 
-function showError(msg) {
+function showError(msg, showRetry = false) {
+  const bar = document.getElementById('errorBar');
   const el = document.getElementById('errorMsg');
+  const retryBtn = document.getElementById('retryBtn');
   if (msg) {
     el.textContent = msg;
-    el.style.display = '';
+    retryBtn.style.display = showRetry ? '' : 'none';
+    bar.style.display = '';
   } else {
-    el.style.display = 'none';
+    bar.style.display = 'none';
+    retryBtn.style.display = 'none';
   }
 }
 
