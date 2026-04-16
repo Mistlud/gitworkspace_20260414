@@ -1,6 +1,8 @@
 let prompts = {};
 let hasSavedKey = false;
 
+const LOCKED_LANGS = ['Korean', 'English'];
+
 window.addEventListener('DOMContentLoaded', async () => {
   prompts = await window.api.getPrompts();
 
@@ -87,6 +89,23 @@ window.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('deleteKeyBtn').addEventListener('click', async () => {
     await window.api.deleteKey();
     updateKeyUI({ exists: false });
+  });
+
+  // Language management
+  renderLangList();
+
+  document.getElementById('langAddBtn').addEventListener('click', () => {
+    const input = document.getElementById('langInput');
+    addLanguage(input.value.trim());
+    input.value = '';
+  });
+
+  document.getElementById('langInput').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      const input = document.getElementById('langInput');
+      addLanguage(input.value.trim());
+      input.value = '';
+    }
   });
 
   // Submit
@@ -246,4 +265,88 @@ function showError(msg) {
   } else {
     el.style.display = 'none';
   }
+}
+
+function renderLangList() {
+  const list = document.getElementById('langList');
+  list.innerHTML = '';
+  (prompts.languages || []).forEach((lang) => {
+    const item = document.createElement('div');
+    item.className = 'lang-item';
+
+    const name = document.createElement('span');
+    name.className = 'lang-item-name';
+    name.textContent = lang;
+
+    const del = document.createElement('button');
+    del.className = 'lang-delete-btn';
+
+    if (LOCKED_LANGS.includes(lang)) {
+      del.textContent = '고정';
+      del.disabled = true;
+      del.classList.add('locked');
+    } else {
+      del.textContent = '삭제';
+      del.addEventListener('click', () => deleteLanguage(lang));
+    }
+
+    item.appendChild(name);
+    item.appendChild(del);
+    list.appendChild(item);
+  });
+}
+
+function showLangFeedback(msg, type) {
+  const el = document.getElementById('langFeedback');
+  el.textContent = msg;
+  el.className = `key-feedback ${type}`;
+  el.style.display = '';
+  setTimeout(() => { el.style.display = 'none'; }, 2500);
+}
+
+async function addLanguage(name) {
+  if (!name) return;
+  if (prompts.languages.includes(name)) {
+    return showLangFeedback(`✗ "${name}"은(는) 이미 목록에 있습니다.`, 'error');
+  }
+  prompts.languages.push(name);
+  await saveAndSyncLanguages();
+  showLangFeedback(`✓ "${name}" 추가됨`, 'ok');
+}
+
+async function deleteLanguage(name) {
+  prompts.languages = prompts.languages.filter((l) => l !== name);
+  await saveAndSyncLanguages();
+}
+
+async function saveAndSyncLanguages() {
+  await window.api.savePrompts(prompts);
+  renderLangList();
+  syncLangDropdowns();
+}
+
+function syncLangDropdowns() {
+  const prevSrc = document.getElementById('sourceLang').value;
+  const prevTgt = document.getElementById('targetLang').value;
+  const languages = prompts.languages || [];
+
+  ['sourceLang', 'targetLang'].forEach((id) => {
+    const select = document.getElementById(id);
+    select.innerHTML = '';
+    languages.forEach((lang) => {
+      const option = document.createElement('option');
+      option.value = lang;
+      option.textContent = lang;
+      select.appendChild(option);
+    });
+  });
+
+  // 기존 선택값이 목록에 남아있으면 유지, 없으면 첫 번째로 초기화
+  const srcEl = document.getElementById('sourceLang');
+  const tgtEl = document.getElementById('targetLang');
+  if (languages.includes(prevSrc)) srcEl.value = prevSrc;
+  if (languages.includes(prevTgt)) tgtEl.value = prevTgt;
+  else if (tgtEl.options.length > 1) tgtEl.selectedIndex = 1;
+
+  updateModeBadge();
 }

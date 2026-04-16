@@ -7,4 +7,5 @@ contextBridge.exposeInMainWorld('api', {
   saveKey: (keyJson) => ipcRenderer.invoke('save-key', keyJson),
   loadKey: () => ipcRenderer.invoke('load-key'),
   deleteKey: () => ipcRenderer.invoke('delete-key'),
+  savePrompts: (data) => ipcRenderer.invoke('save-prompts', data),
 });

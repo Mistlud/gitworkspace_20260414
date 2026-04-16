@@ -493,6 +493,95 @@ textarea#inputText {
   background: #3a8a5a;
 }
 
+/* ── Language List ── */
+.settings-section + .settings-section {
+  margin-top: 28px;
+}
+
+.lang-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 10px;
+}
+
+.lang-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 12px;
+  background: #16162a;
+  border: 1px solid #3a3a60;
+  border-radius: 6px;
+}
+
+.lang-item-name {
+  font-size: 13px;
+  color: #ccc;
+}
+
+.lang-delete-btn {
+  padding: 3px 12px;
+  border-radius: 5px;
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  background: transparent;
+  border: 1px solid #7a2a2a;
+  color: #f08080;
+}
+
+.lang-delete-btn:hover:not(:disabled) {
+  background: #3a1a1a;
+  color: #ff9999;
+}
+
+.lang-delete-btn.locked {
+  border-color: #3a3a60;
+  color: #555;
+  cursor: default;
+}
+
+.lang-add-row {
+  display: flex;
+  gap: 8px;
+}
+
+.lang-add-row input {
+  flex: 1;
+  background: #16162a;
+  border: 1px solid #3a3a60;
+  border-radius: 6px;
+  color: #ccc;
+  font-size: 13px;
+  font-family: inherit;
+  padding: 6px 10px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.lang-add-row input:focus {
+  border-color: #7eb8f7;
+}
+
+.lang-add-row button {
+  padding: 6px 16px;
+  background: #2a4a6a;
+  border: none;
+  border-radius: 6px;
+  color: #7eb8f7;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.lang-add-row button:hover {
+  background: #3a5a8a;
+}
+
 /* ── Tab 3: Placeholder ── */
 .placeholder {
   flex: 1;

@@ -148,3 +148,14 @@ ipcMain.handle('get-prompts', async () => {
   const raw = fs.readFileSync(promptsPath, 'utf-8');
   return JSON.parse(raw);
 });
+
+// Save prompts
+ipcMain.handle('save-prompts', async (event, data) => {
+  try {
+    const promptsPath = path.join(__dirname, 'prompts.json');
+    fs.writeFileSync(promptsPath, JSON.stringify(data, null, 2), 'utf-8');
+    return { success: true };
+  } catch (err) {
+    return { success: false, error: err.message };
+  }
+});
