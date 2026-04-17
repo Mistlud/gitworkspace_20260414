@@ -221,11 +221,14 @@ function updateKeyUI(state) {
   hasSavedKey = state.exists;
   const savedDisplay = document.getElementById('savedKeyDisplay');
   const inputArea = document.getElementById('keyInputArea');
+  const indicator = document.getElementById('keyIndicator');
 
   if (state.exists) {
     document.getElementById('savedProjectId').textContent = state.projectId;
     savedDisplay.style.display = '';
     inputArea.style.display = 'none';
+    indicator.textContent = '● 키 설정됨';
+    indicator.className = 'key-indicator ok';
   } else {
     savedDisplay.style.display = 'none';
     inputArea.style.display = '';
@@ -234,6 +237,8 @@ function updateKeyUI(state) {
     document.getElementById('fileStatus').textContent = '선택된 파일 없음';
     document.getElementById('keyFeedback').style.display = 'none';
     document.getElementById('saveKeyBtn').style.display = 'none';
+    indicator.textContent = '⚠ 키 미설정';
+    indicator.className = 'key-indicator missing';
   }
 }
 

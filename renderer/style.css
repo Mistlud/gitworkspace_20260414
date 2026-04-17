@@ -165,6 +165,27 @@ html, body {
   color: #b07ef7;
 }
 
+/* ── Key Indicator ── */
+.key-indicator {
+  font-size: 12px;
+  white-space: nowrap;
+  padding: 3px 8px;
+  border-radius: 10px;
+  font-weight: 500;
+}
+
+.key-indicator.ok {
+  background: #1a3a2a;
+  color: #6fcf97;
+  border: 1px solid #2a6a4a;
+}
+
+.key-indicator.missing {
+  background: #3a2a1a;
+  color: #f0a060;
+  border: 1px solid #7a5a2a;
+}
+
 .submit-btn {
   padding: 6px 20px;
   background: #4a90e2;
