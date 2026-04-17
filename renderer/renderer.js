@@ -222,6 +222,7 @@ function updateKeyUI(state) {
   const savedDisplay = document.getElementById('savedKeyDisplay');
   const inputArea = document.getElementById('keyInputArea');
   const indicator = document.getElementById('keyIndicator');
+  const homeIndicator = document.getElementById('homeKeyIndicator');
 
   if (state.exists) {
     document.getElementById('savedProjectId').textContent = state.projectId;
@@ -229,6 +230,8 @@ function updateKeyUI(state) {
     inputArea.style.display = 'none';
     indicator.textContent = '● 키 설정됨';
     indicator.className = 'key-indicator ok';
+    homeIndicator.textContent = '● 키 설정됨';
+    homeIndicator.className = 'key-indicator ok';
   } else {
     savedDisplay.style.display = 'none';
     inputArea.style.display = '';
@@ -239,6 +242,8 @@ function updateKeyUI(state) {
     document.getElementById('saveKeyBtn').style.display = 'none';
     indicator.textContent = '⚠ 키 미설정';
     indicator.className = 'key-indicator missing';
+    homeIndicator.textContent = '⚠ 키 미설정';
+    homeIndicator.className = 'key-indicator missing';
   }
 }
 

@@ -12,7 +12,11 @@
     <!-- Sidebar -->
     <nav class="sidebar">
       <div class="tab-buttons">
-        <button class="tab-btn active" data-tab="translate">
+        <button class="tab-btn active" data-tab="home">
+          <span class="tab-icon">⌂</span>
+          <span class="tab-label">홈</span>
+        </button>
+        <button class="tab-btn" data-tab="translate">
           <span class="tab-icon">⇄</span>
           <span class="tab-label">번역</span>
         </button>
@@ -31,8 +35,42 @@
     <!-- Content -->
     <main class="content">
 
+      <!-- Tab 0: Home -->
+      <div class="tab-panel active" id="tab-home">
+        <div class="home-wrap">
+          <div class="home-header">
+            <div class="home-title">LLM Tool</div>
+            <div class="home-subtitle">Vertex AI 기반 번역 · 교정 도구</div>
+            <span class="key-indicator" id="homeKeyIndicator"></span>
+          </div>
+
+          <div class="home-section">
+            <div class="home-section-title">사용 방법</div>
+            <ol class="home-steps">
+              <li><strong>설정</strong> 탭에서 Vertex AI JSON 키를 등록하세요.</li>
+              <li><strong>번역</strong> 탭에서 출발어와 도착어를 선택하세요.</li>
+              <li>텍스트를 입력하고 <strong>전송</strong> 버튼을 누르세요.</li>
+            </ol>
+          </div>
+
+          <div class="home-section">
+            <div class="home-section-title">번역 vs 교정</div>
+            <div class="home-mode-desc">
+              <div class="home-mode-item">
+                <span class="mode-badge">번역</span>
+                <span>출발어와 도착어가 <strong>다를 때</strong> 자동 적용됩니다.</span>
+              </div>
+              <div class="home-mode-item">
+                <span class="mode-badge grammar">교정</span>
+                <span>출발어와 도착어가 <strong>같을 때</strong> 자동 적용됩니다.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <!-- Tab 1: Translation -->
-      <div class="tab-panel active" id="tab-translate">
+      <div class="tab-panel" id="tab-translate">
         <div class="control-bar">
           <div class="lang-row">
             <select id="sourceLang"></select>
