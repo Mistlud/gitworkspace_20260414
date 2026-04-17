@@ -30,6 +30,8 @@ function createWindow() {
     ...(state.x !== undefined && { x: state.x }),
     ...(state.y !== undefined && { y: state.y }),
     frame: false,
+    transparent: true,
+    backgroundColor: '#00000000',
     webPreferences: {
       preload: path.join(__dirname, 'preload.js'),
       contextIsolation: true,
@@ -166,6 +168,29 @@ ipcMain.handle('send-to-vertex', async (event, { keyJson, systemPrompt, userMess
       ? '요청 시간이 초과됐습니다 (30초). 네트워크 상태를 확인하고 다시 시도해주세요.'
       : err.message;
     return { success: false, error: message, isTimeout };
+  }
+});
+
+// Always on top
+ipcMain.on('set-always-on-top', (event, flag) => {
+  const win = BrowserWindow.fromWebContents(event.sender);
+  if (win) win.setAlwaysOnTop(flag);
+});
+
+// Opacity
+ipcMain.handle('get-opacity', async () => {
+  const state = loadWindowState();
+  return state.opacity ?? 1.0;
+});
+
+ipcMain.handle('save-opacity', async (event, opacity) => {
+  try {
+    const state = loadWindowState();
+    state.opacity = opacity;
+    fs.writeFileSync(windowStatePath(), JSON.stringify(state), 'utf-8');
+    return { success: true };
+  } catch {
+    return { success: false };
   }
 });
 

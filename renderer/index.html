@@ -29,6 +29,8 @@
           <span class="tab-label">기타</span>
         </button>
       </div>
+      <button class="pin-btn" id="pinBtn">⊤</button>
+      <button class="opacity-btn" id="opacityBtn">◑</button>
       <button class="close-btn" id="closeBtn">✕</button>
     </nav>
 
@@ -42,6 +44,10 @@
             <div class="home-title">LLM Tool</div>
             <div class="home-subtitle">Vertex AI 기반 번역 · 교정 도구</div>
             <span class="key-indicator" id="homeKeyIndicator"></span>
+            <p class="home-key-hint" id="homeKeyHint" style="display:none">
+              설정(⚙) 탭에서 Vertex AI 서비스 계정 JSON 키를 등록해주세요.<br>
+              키가 없으면 번역·교정 기능을 사용할 수 없습니다.
+            </p>
           </div>
 
           <div class="home-section">
@@ -186,6 +192,23 @@
       </div>
 
     </main>
+  </div>
+
+  <!-- Opacity Popover -->
+  <div id="opacityPopover" class="opacity-popover" style="display:none">
+    <input type="range" id="opacitySlider" min="20" max="100" step="5" value="100" />
+    <span id="opacityValue" class="opacity-value">100%</span>
+  </div>
+
+  <!-- Submit Confirm Modal -->
+  <div id="submitConfirmModal" class="modal-overlay" style="display:none">
+    <div class="modal">
+      <p class="modal-message">전송하시겠습니까?</p>
+      <div class="modal-actions">
+        <button id="submitModalCancel">취소</button>
+        <button id="submitModalConfirm" class="modal-confirm modal-confirm-send">전송</button>
+      </div>
+    </div>
   </div>
 
   <!-- Confirm Modal -->

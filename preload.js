@@ -8,4 +8,7 @@ contextBridge.exposeInMainWorld('api', {
   loadKey: () => ipcRenderer.invoke('load-key'),
   deleteKey: () => ipcRenderer.invoke('delete-key'),
   savePrompts: (data) => ipcRenderer.invoke('save-prompts', data),
+  setAlwaysOnTop: (flag) => ipcRenderer.send('set-always-on-top', flag),
+  getOpacity: () => ipcRenderer.invoke('get-opacity'),
+  saveOpacity: (val) => ipcRenderer.invoke('save-opacity', val),
 });

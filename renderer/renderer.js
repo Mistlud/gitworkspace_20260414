@@ -43,6 +43,53 @@ window.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
+  // Pin (always on top)
+  let isAlwaysOnTop = false;
+  const pinBtn = document.getElementById('pinBtn');
+  pinBtn.addEventListener('click', () => {
+    isAlwaysOnTop = !isAlwaysOnTop;
+    window.api.setAlwaysOnTop(isAlwaysOnTop);
+    pinBtn.classList.toggle('active', isAlwaysOnTop);
+  });
+
+  // Opacity
+  const savedOpacity = await window.api.getOpacity();
+  applyOpacity(savedOpacity);
+
+  const opacityBtn = document.getElementById('opacityBtn');
+  const opacityPopover = document.getElementById('opacityPopover');
+  const opacitySlider = document.getElementById('opacitySlider');
+  const opacityValueLabel = document.getElementById('opacityValue');
+
+  opacityBtn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    if (opacityPopover.style.display === 'none') {
+      opacityPopover.style.display = 'flex';
+      requestAnimationFrame(() => {
+        const btnRect = opacityBtn.getBoundingClientRect();
+        const popRect = opacityPopover.getBoundingClientRect();
+        opacityPopover.style.top = `${btnRect.top + btnRect.height / 2 - popRect.height / 2}px`;
+      });
+    } else {
+      opacityPopover.style.display = 'none';
+    }
+  });
+
+  let opacitySaveTimer;
+  opacitySlider.addEventListener('input', () => {
+    const val = parseInt(opacitySlider.value, 10);
+    opacityValueLabel.textContent = `${val}%`;
+    document.documentElement.style.setProperty('--bg-alpha', val / 100);
+    clearTimeout(opacitySaveTimer);
+    opacitySaveTimer = setTimeout(() => window.api.saveOpacity(val / 100), 500);
+  });
+
+  document.addEventListener('click', (e) => {
+    if (!opacityPopover.contains(e.target) && e.target !== opacityBtn) {
+      opacityPopover.style.display = 'none';
+    }
+  });
+
   // Close button
   document.getElementById('closeBtn').addEventListener('click', () => {
     showConfirmModal(() => window.api.closeWindow());
@@ -163,6 +210,14 @@ window.addEventListener('DOMContentLoaded', async () => {
   document.getElementById('submitBtn').addEventListener('click', handleSubmit);
   document.getElementById('retryBtn').addEventListener('click', handleSubmit);
 
+  // Ctrl+Enter shortcut
+  document.addEventListener('keydown', (e) => {
+    if (e.ctrlKey && e.key === 'Enter') {
+      const translateTab = document.getElementById('tab-translate');
+      if (translateTab.classList.contains('active')) showSubmitConfirmModal();
+    }
+  });
+
   // Clear input button
   document.getElementById('clearInputBtn').addEventListener('click', () => {
     document.getElementById('inputText').value = '';
@@ -178,6 +233,13 @@ window.addEventListener('DOMContentLoaded', async () => {
     });
   });
 });
+
+function applyOpacity(value) {
+  document.documentElement.style.setProperty('--bg-alpha', value);
+  const pct = Math.round(value * 100);
+  document.getElementById('opacitySlider').value = pct;
+  document.getElementById('opacityValue').textContent = `${pct}%`;
+}
 
 function updateModeBadge() {
   const src = document.getElementById('sourceLang').value;
@@ -223,6 +285,7 @@ function updateKeyUI(state) {
   const inputArea = document.getElementById('keyInputArea');
   const indicator = document.getElementById('keyIndicator');
   const homeIndicator = document.getElementById('homeKeyIndicator');
+  const homeKeyHint = document.getElementById('homeKeyHint');
 
   if (state.exists) {
     document.getElementById('savedProjectId').textContent = state.projectId;
@@ -232,6 +295,7 @@ function updateKeyUI(state) {
     indicator.className = 'key-indicator ok';
     homeIndicator.textContent = '● 키 설정됨';
     homeIndicator.className = 'key-indicator ok';
+    homeKeyHint.style.display = 'none';
   } else {
     savedDisplay.style.display = 'none';
     inputArea.style.display = '';
@@ -244,6 +308,7 @@ function updateKeyUI(state) {
     indicator.className = 'key-indicator missing';
     homeIndicator.textContent = '⚠ 키 미설정';
     homeIndicator.className = 'key-indicator missing';
+    homeKeyHint.style.display = '';
   }
 }
 
@@ -296,6 +361,30 @@ function showResult(text) {
 function clearResult() {
   document.getElementById('resultText').textContent = '';
   document.getElementById('copyBtn').style.display = 'none';
+}
+
+function showSubmitConfirmModal() {
+  const modal = document.getElementById('submitConfirmModal');
+  const confirmBtn = document.getElementById('submitModalConfirm');
+  const cancelBtn = document.getElementById('submitModalCancel');
+
+  modal.style.display = 'flex';
+  confirmBtn.focus();
+
+  function cleanup() {
+    modal.style.display = 'none';
+    confirmBtn.replaceWith(confirmBtn.cloneNode(true));
+    cancelBtn.replaceWith(cancelBtn.cloneNode(true));
+  }
+
+  document.getElementById('submitModalConfirm').addEventListener('click', () => {
+    cleanup();
+    handleSubmit();
+  }, { once: true });
+
+  document.getElementById('submitModalCancel').addEventListener('click', () => {
+    cleanup();
+  }, { once: true });
 }
 
 function showConfirmModal(onConfirm) {
