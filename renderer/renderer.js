@@ -1,5 +1,6 @@
 let prompts = {};
 let hasSavedKey = false;
+let currentMode = 'translation';
 const history = [];
 let lastDeleted = null;
 
@@ -12,27 +13,22 @@ window.addEventListener('DOMContentLoaded', async () => {
   const keyState = await window.api.loadKey();
   updateKeyUI(keyState);
 
-  // Populate language dropdowns
+  // Populate target language dropdown
   const languages = prompts.languages || [];
-  ['sourceLang', 'targetLang'].forEach((id) => {
-    const select = document.getElementById(id);
-    languages.forEach((lang) => {
-      const option = document.createElement('option');
-      option.value = lang;
-      option.textContent = lang;
-      select.appendChild(option);
-    });
-  });
-
-  // Default target lang to second option if available
   const targetSelect = document.getElementById('targetLang');
+  languages.forEach((lang) => {
+    const option = document.createElement('option');
+    option.value = lang;
+    option.textContent = lang;
+    targetSelect.appendChild(option);
+  });
   if (targetSelect.options.length > 1) targetSelect.selectedIndex = 1;
 
-  updateModeBadge();
-
-  // Language change → update mode badge
-  document.getElementById('sourceLang').addEventListener('change', updateModeBadge);
-  document.getElementById('targetLang').addEventListener('change', updateModeBadge);
+  // Mode toggle button
+  document.getElementById('modeToggleBtn').addEventListener('click', () => {
+    currentMode = currentMode === 'translation' ? 'grammar' : 'translation';
+    updateModeToggle();
+  });
 
   // Tab switching
   document.querySelectorAll('.tab-btn').forEach((btn) => {
@@ -275,17 +271,13 @@ function applyOpacity(value) {
   document.getElementById('opacityValue').textContent = `${pct}%`;
 }
 
-function updateModeBadge() {
-  const src = document.getElementById('sourceLang').value;
-  const tgt = document.getElementById('targetLang').value;
-  const badge = document.getElementById('modeBadge');
-  if (src === tgt) {
-    badge.textContent = '교정';
-    badge.classList.add('grammar');
-  } else {
-    badge.textContent = '번역';
-    badge.classList.remove('grammar');
-  }
+
+function updateModeToggle() {
+  document.querySelectorAll('.mode-switch-label').forEach((label) => {
+    label.classList.toggle('active', label.dataset.mode === currentMode);
+  });
+  const wrap = document.getElementById('targetLangWrap');
+  wrap.style.visibility = currentMode === 'translation' ? '' : 'hidden';
 }
 
 function validateKey(raw) {
@@ -350,18 +342,15 @@ async function handleSubmit() {
   const keyJson = hasSavedKey ? '' : document.getElementById('keyTextarea').value.trim();
   if (!hasSavedKey && !keyJson) return showError('설정 탭에서 Vertex AI JSON 키를 먼저 입력해주세요.');
 
-  const sourceLang = document.getElementById('sourceLang').value;
   const targetLang = document.getElementById('targetLang').value;
   const inputText = document.getElementById('inputText').value.trim();
 
   if (!inputText) return showError('텍스트를 입력해주세요.');
 
-  const task = sourceLang === targetLang ? 'grammar' : 'translation';
-  const systemPrompt = prompts[task] || '';
-  const langInfo = task === 'translation'
-    ? `Source language: ${sourceLang}\nTarget language: ${targetLang}`
-    : `Language: ${sourceLang}`;
-  const userMessage = `${langInfo}\n\nText:\n${inputText}`;
+  const systemPrompt = prompts[currentMode] || '';
+  const userMessage = currentMode === 'translation'
+    ? `Target language: ${targetLang}\n\nText:\n${inputText}`
+    : `Text:\n${inputText}`;
 
   showError('');
   clearResult();
@@ -375,9 +364,8 @@ async function handleSubmit() {
     showError('');
     showResult(response.result);
     addHistory({
-      sourceLang,
       targetLang,
-      mode: task,
+      mode: currentMode,
       input: inputText,
       result: response.result
     });
@@ -567,8 +555,8 @@ function renderHistory(selectedId) {
     card.className = 'history-card' + (item.id === activeId ? ' selected' : '');
 
     const langText = item.mode === 'translation'
-      ? `${item.sourceLang} → ${item.targetLang}`
-      : `${item.sourceLang} 교정`;
+      ? `→ ${item.targetLang}`
+      : '';
 
     card.innerHTML = `
       <div class="history-card-header">
@@ -627,27 +615,18 @@ function setHistoryPanes(item) {
 }
 
 function syncLangDropdowns() {
-  const prevSrc = document.getElementById('sourceLang').value;
   const prevTgt = document.getElementById('targetLang').value;
   const languages = prompts.languages || [];
 
-  ['sourceLang', 'targetLang'].forEach((id) => {
-    const select = document.getElementById(id);
-    select.innerHTML = '';
-    languages.forEach((lang) => {
-      const option = document.createElement('option');
-      option.value = lang;
-      option.textContent = lang;
-      select.appendChild(option);
-    });
+  const tgtEl = document.getElementById('targetLang');
+  tgtEl.innerHTML = '';
+  languages.forEach((lang) => {
+    const option = document.createElement('option');
+    option.value = lang;
+    option.textContent = lang;
+    tgtEl.appendChild(option);
   });
 
-  // 기존 선택값이 목록에 남아있으면 유지, 없으면 첫 번째로 초기화
-  const srcEl = document.getElementById('sourceLang');
-  const tgtEl = document.getElementById('targetLang');
-  if (languages.includes(prevSrc)) srcEl.value = prevSrc;
   if (languages.includes(prevTgt)) tgtEl.value = prevTgt;
   else if (tgtEl.options.length > 1) tgtEl.selectedIndex = 1;
-
-  updateModeBadge();
 }

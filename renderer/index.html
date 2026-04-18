@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'">
-  <title>LLM Tool</title>
+  <title>LLMTransTool</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 <body>
@@ -33,8 +33,8 @@
           <span class="tab-label">설정</span>
         </button>
       </div>
-      <button class="pin-btn" id="pinBtn">⊤</button>
-      <button class="opacity-btn" id="opacityBtn">◑</button>
+      <button class="pin-btn" id="pinBtn">📌</button>
+      <button class="opacity-btn" id="opacityBtn">🔆</button>
       <button class="close-btn" id="closeBtn">✕</button>
     </nav>
 
@@ -45,7 +45,7 @@
       <div class="tab-panel active" id="tab-home">
         <div class="home-wrap">
           <div class="home-header">
-            <div class="home-title">LLM Tool</div>
+            <div class="home-title">LLMTransTool</div>
             <div class="home-subtitle">Vertex AI 기반 번역 · 교정 도구</div>
             <span class="key-indicator" id="homeKeyIndicator"></span>
             <p class="home-key-hint" id="homeKeyHint" style="display:none">
@@ -58,8 +58,8 @@
             <div class="home-section-title">사용 방법</div>
             <ol class="home-steps">
               <li><strong>설정</strong> 탭에서 Vertex AI JSON 키를 등록하세요.</li>
-              <li><strong>번역</strong> 탭에서 출발어와 도착어를 선택하세요.</li>
-              <li>텍스트를 입력하고 <strong>전송</strong> 버튼을 누르세요.</li>
+              <li><strong>번역</strong> 탭에서 모드를 선택하세요. 번역 모드는 도착어도 함께 선택합니다.</li>
+              <li>텍스트를 입력하고 <strong>전송</strong> 버튼을 누르세요. <strong>Ctrl+Enter</strong>로도 전송할 수 있습니다.</li>
             </ol>
           </div>
 
@@ -68,12 +68,22 @@
             <div class="home-mode-desc">
               <div class="home-mode-item">
                 <span class="mode-badge">번역</span>
-                <span>출발어와 도착어가 <strong>다를 때</strong> 자동 적용됩니다.</span>
+                <span>텍스트를 선택한 도착어로 번역합니다.</span>
               </div>
               <div class="home-mode-item">
                 <span class="mode-badge grammar">교정</span>
-                <span>출발어와 도착어가 <strong>같을 때</strong> 자동 적용됩니다.</span>
+                <span>텍스트의 문법·철자·구두점을 교정합니다.</span>
               </div>
+            </div>
+          </div>
+
+          <div class="home-section">
+            <div class="home-section-title">기타 기능</div>
+            <div class="home-misc-list">
+              <div class="home-misc-item"><span class="home-misc-key">이력</span>최근 번역·교정 결과 최대 10건 보관. 앱 종료 시 초기화됩니다.</div>
+              <div class="home-misc-item"><span class="home-misc-key">설정</span>모델, 토큰 수, 언어 목록, 번역·교정 프롬프트를 직접 편집할 수 있습니다.</div>
+              <div class="home-misc-item"><span class="home-misc-key">⊤</span>창을 항상 위에 고정합니다.</div>
+              <div class="home-misc-item"><span class="home-misc-key">◑</span>창 배경 투명도를 조절합니다.</div>
             </div>
           </div>
         </div>
@@ -83,9 +93,14 @@
       <div class="tab-panel" id="tab-translate">
         <div class="control-bar">
           <div class="lang-row">
-            <select id="sourceLang"></select>
-            <span class="mode-badge" id="modeBadge">번역</span>
-            <select id="targetLang"></select>
+            <button class="mode-switch" id="modeToggleBtn">
+              <span class="mode-switch-label active" data-mode="translation">번역</span>
+              <span class="mode-switch-label" data-mode="grammar">교정</span>
+            </button>
+            <div id="targetLangWrap">
+              <span class="lang-label">도착언어</span>
+              <select id="targetLang"></select>
+            </div>
           </div>
           <span class="key-indicator" id="keyIndicator"></span>
           <button class="submit-btn" id="submitBtn">전송</button>

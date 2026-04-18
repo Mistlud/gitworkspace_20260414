@@ -4,6 +4,9 @@ const fs = require('fs');
 const { GoogleAuth } = require('google-auth-library');
 
 const keyFilePath = () => path.join(app.getPath('userData'), 'saved-key.bin');
+const promptsFilePath = () => app.isPackaged
+  ? path.join(process.resourcesPath, 'prompts.json')
+  : promptsFilePath();
 const windowStatePath = () => path.join(app.getPath('userData'), 'window-state.json');
 
 function loadWindowState() {
@@ -120,7 +123,7 @@ ipcMain.handle('send-to-vertex', async (event, { keyJson, systemPrompt, userMess
     const { token } = await client.getAccessToken();
 
     const projectId = credentials.project_id;
-    const promptsPath = path.join(__dirname, 'prompts.json');
+    const promptsPath = promptsFilePath();
     const promptsData = JSON.parse(fs.readFileSync(promptsPath, 'utf-8'));
     const model = promptsData.model || 'gemini-3-flash-preview';
 
@@ -202,7 +205,7 @@ ipcMain.on('close-window', (event) => {
 
 // Load prompts
 ipcMain.handle('get-prompts', async () => {
-  const promptsPath = path.join(__dirname, 'prompts.json');
+  const promptsPath = promptsFilePath();
   const raw = fs.readFileSync(promptsPath, 'utf-8');
   return JSON.parse(raw);
 });
@@ -210,7 +213,7 @@ ipcMain.handle('get-prompts', async () => {
 // Save prompts
 ipcMain.handle('save-prompts', async (event, data) => {
   try {
-    const promptsPath = path.join(__dirname, 'prompts.json');
+    const promptsPath = promptsFilePath();
     fs.writeFileSync(promptsPath, JSON.stringify(data, null, 2), 'utf-8');
     return { success: true };
   } catch (err) {
