@@ -20,13 +20,17 @@
           <span class="tab-icon">⇄</span>
           <span class="tab-label">번역</span>
         </button>
+        <button class="tab-btn" data-tab="tab3">
+          <span class="tab-icon">☰</span>
+          <span class="tab-label">이력</span>
+        </button>
+        <button class="tab-btn" data-tab="tab4">
+          <span class="tab-icon">◇</span>
+          <span class="tab-label">기타</span>
+        </button>
         <button class="tab-btn" data-tab="settings">
           <span class="tab-icon">⚙</span>
           <span class="tab-label">설정</span>
-        </button>
-        <button class="tab-btn" data-tab="tab3">
-          <span class="tab-icon">☰</span>
-          <span class="tab-label">기타</span>
         </button>
       </div>
       <button class="pin-btn" id="pinBtn">⊤</button>
@@ -99,6 +103,13 @@
         <div id="errorBar" class="error-bar" style="display:none">
           <span id="errorMsg" class="error-msg"></span>
           <button id="retryBtn" class="retry-btn" style="display:none">재시도</button>
+        </div>
+      </div>
+
+      <!-- Tab 4: TBD -->
+      <div class="tab-panel" id="tab-tab4">
+        <div class="placeholder">
+          <span>준비 중</span>
         </div>
       </div>
 
@@ -184,10 +195,25 @@
         </div>
       </div>
 
-      <!-- Tab 3: TBD -->
+      <!-- Tab 3: History -->
       <div class="tab-panel" id="tab-tab3">
-        <div class="placeholder">
-          <span>준비 중</span>
+        <div class="history-header">
+          <span class="history-title">번역/교정 이력</span>
+          <button class="history-clear-btn" id="historyClearBtn">전체 삭제</button>
+        </div>
+        <div class="history-list" id="historyList">
+          <div class="history-empty" id="historyEmpty">이력이 없습니다.</div>
+        </div>
+        <div class="history-divider"></div>
+        <div class="history-panels">
+          <div class="history-pane">
+            <div class="history-pane-label">입력</div>
+            <div class="history-pane-text" id="historyInputPane"></div>
+          </div>
+          <div class="history-pane">
+            <div class="history-pane-label">결과</div>
+            <div class="history-pane-text" id="historyResultPane"></div>
+          </div>
         </div>
       </div>
 

@@ -1,5 +1,6 @@
 let prompts = {};
 let hasSavedKey = false;
+const history = [];
 
 const LOCKED_LANGS = ['Korean', 'English'];
 
@@ -223,6 +224,12 @@ window.addEventListener('DOMContentLoaded', async () => {
     document.getElementById('inputText').value = '';
   });
 
+  // History clear button
+  document.getElementById('historyClearBtn').addEventListener('click', () => {
+    history.length = 0;
+    renderHistory(null);
+  });
+
   // Copy button
   document.getElementById('copyBtn').addEventListener('click', () => {
     const text = document.getElementById('resultText').textContent;
@@ -340,6 +347,13 @@ async function handleSubmit() {
   if (response.success) {
     showError('');
     showResult(response.result);
+    addHistory({
+      sourceLang,
+      targetLang,
+      mode: task,
+      input: inputText,
+      result: response.result
+    });
   } else {
     showError(`오류: ${response.error}`, true);
   }
@@ -487,6 +501,73 @@ async function saveAndSyncLanguages() {
   await window.api.savePrompts(prompts);
   renderLangList();
   syncLangDropdowns();
+}
+
+function addHistory(entry) {
+  const now = new Date();
+  const timestamp = `${now.getMonth() + 1}/${now.getDate()} ${String(now.getHours()).padStart(2, '0')}:${String(now.getMinutes()).padStart(2, '0')}`;
+  history.unshift({ id: Date.now(), timestamp, ...entry });
+  if (history.length > 10) history.pop();
+  renderHistory();
+}
+
+function renderHistory(selectedId) {
+  const list = document.getElementById('historyList');
+  const empty = document.getElementById('historyEmpty');
+
+  list.querySelectorAll('.history-card').forEach(el => el.remove());
+
+  if (history.length === 0) {
+    empty.style.display = '';
+    setHistoryPanes(null);
+    return;
+  }
+  empty.style.display = 'none';
+
+  const activeId = selectedId ?? history[0].id;
+
+  history.forEach((item) => {
+    const card = document.createElement('div');
+    card.className = 'history-card' + (item.id === activeId ? ' selected' : '');
+
+    const langText = item.mode === 'translation'
+      ? `${item.sourceLang} → ${item.targetLang}`
+      : `${item.sourceLang} 교정`;
+
+    card.innerHTML = `
+      <div class="history-card-header">
+        <div class="history-card-meta">
+          <span class="history-time">${item.timestamp}</span>
+          <span class="mode-badge${item.mode === 'grammar' ? ' grammar' : ''}">${item.mode === 'translation' ? '번역' : '교정'}</span>
+          <span class="history-langs">${langText}</span>
+        </div>
+        <span class="history-preview">${item.input.replace(/\n/g, ' ')}</span>
+        <button class="history-delete-btn">삭제</button>
+      </div>
+    `;
+
+    card.addEventListener('click', (e) => {
+      if (e.target.classList.contains('history-delete-btn')) return;
+      renderHistory(item.id);
+    });
+
+    card.querySelector('.history-delete-btn').addEventListener('click', () => {
+      const idx = history.findIndex(h => h.id === item.id);
+      if (idx !== -1) history.splice(idx, 1);
+      const nextId = history.length > 0 ? history[Math.min(idx, history.length - 1)].id : null;
+      renderHistory(nextId);
+    });
+
+    list.appendChild(card);
+  });
+
+  const activeItem = history.find(h => h.id === activeId);
+  setHistoryPanes(activeItem);
+}
+
+function setHistoryPanes(item) {
+  document.getElementById('historyInputPane').textContent = item ? item.input : '';
+  document.getElementById('historyResultPane').textContent = item ? item.result : '';
 }
 
 function syncLangDropdowns() {
