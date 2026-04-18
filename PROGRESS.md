@@ -170,7 +170,7 @@
 
 ### Phase 5 — 배포
 - ~~electron-builder 설정 (포터블 ZIP 형태)~~ → 완료 (v0.9.0, 동작 확인)
-- GitHub Actions 워크플로 작성 (push 시 자동 빌드 → Releases 업로드)
+- ~~GitHub Actions 워크플로 작성~~ → 완료 (태그 push 시 자동 빌드 → Releases 업로드 확인)
 - 앱 아이콘 설정
 
 ---

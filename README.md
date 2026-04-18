@@ -1,14 +1,23 @@
 # LLM Translation & Grammar Correction
 
-[최신 버전 다운로드](https://github.com/Mistlud/gitworkspace_20260414/releases/latest)
-
 Google Vertex AI(Gemini)를 활용한 번역 및 문법 교정 데스크톱 앱.
 
-## 실행 방법
+## 다운로드
+
+[최신 버전 릴리즈](https://github.com/Mistlud/gitworkspace_20260414/releases/latest)에서 `LLMTransTool-*-win.zip`을 받아 압축 해제 후 실행하세요.
+
+## 개발 환경 실행
 
 ```bash
 npm install
 npm start
+```
+
+## 빌드
+
+```bash
+npm run build
+# dist/ 폴더에 win.zip 생성
 ```
 
 ## 파일 구조
