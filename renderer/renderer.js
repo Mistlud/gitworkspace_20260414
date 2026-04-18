@@ -1,6 +1,7 @@
 let prompts = {};
 let hasSavedKey = false;
 const history = [];
+let lastDeleted = null;
 
 const LOCKED_LANGS = ['Korean', 'English'];
 
@@ -226,8 +227,34 @@ window.addEventListener('DOMContentLoaded', async () => {
 
   // History clear button
   document.getElementById('historyClearBtn').addEventListener('click', () => {
-    history.length = 0;
-    renderHistory(null);
+    if (history.length === 0) {
+      showHistoryFeedback('삭제할 이력이 없습니다.');
+      return;
+    }
+    showConfirmModal('이력을 모두 삭제하시겠습니까?', () => {
+      history.length = 0;
+      clearUndo();
+      renderHistory(null);
+    }, '삭제');
+  });
+
+  // History copy button
+  document.getElementById('historyCopyBtn').addEventListener('click', () => {
+    const text = document.getElementById('historyResultPane').textContent;
+    navigator.clipboard.writeText(text).then(() => {
+      const btn = document.getElementById('historyCopyBtn');
+      btn.textContent = '복사됨';
+      setTimeout(() => { btn.textContent = '복사'; }, 1500);
+    });
+  });
+
+  // Undo button
+  document.getElementById('historyUndoBtn').addEventListener('click', () => {
+    if (!lastDeleted) return;
+    const { idx, item } = lastDeleted;
+    history.splice(idx, 0, item);
+    clearUndo();
+    renderHistory(item.id);
   });
 
   // Copy button
@@ -401,14 +428,23 @@ function showSubmitConfirmModal() {
   }, { once: true });
 }
 
-function showConfirmModal(onConfirm) {
+function showConfirmModal(messageOrCallback, onConfirm, confirmLabel = '종료') {
   const modal = document.getElementById('confirmModal');
+  const msgEl = modal.querySelector('.modal-message');
+  const defaultMsg = '종료하시겠습니까?';
+  if (typeof messageOrCallback === 'function') {
+    onConfirm = messageOrCallback;
+  } else {
+    msgEl.textContent = messageOrCallback;
+  }
   modal.style.display = 'flex';
   const confirmBtn = document.getElementById('modalConfirm');
   const cancelBtn = document.getElementById('modalCancel');
+  confirmBtn.textContent = confirmLabel;
 
   function cleanup() {
     modal.style.display = 'none';
+    msgEl.textContent = defaultMsg;
     confirmBtn.replaceWith(confirmBtn.cloneNode(true));
     cancelBtn.replaceWith(cancelBtn.cloneNode(true));
   }
@@ -553,9 +589,12 @@ function renderHistory(selectedId) {
 
     card.querySelector('.history-delete-btn').addEventListener('click', () => {
       const idx = history.findIndex(h => h.id === item.id);
-      if (idx !== -1) history.splice(idx, 1);
+      if (idx === -1) return;
+      lastDeleted = { idx, item: history[idx] };
+      history.splice(idx, 1);
       const nextId = history.length > 0 ? history[Math.min(idx, history.length - 1)].id : null;
       renderHistory(nextId);
+      showUndoToast();
     });
 
     list.appendChild(card);
@@ -565,9 +604,26 @@ function renderHistory(selectedId) {
   setHistoryPanes(activeItem);
 }
 
+function showHistoryFeedback(msg) {
+  const el = document.getElementById('historyFeedback');
+  el.textContent = msg;
+  el.style.display = '';
+  setTimeout(() => { el.style.display = 'none'; }, 2000);
+}
+
+function showUndoToast() {
+  document.getElementById('historyUndoBar').style.display = 'flex';
+}
+
+function clearUndo() {
+  lastDeleted = null;
+  document.getElementById('historyUndoBar').style.display = 'none';
+}
+
 function setHistoryPanes(item) {
   document.getElementById('historyInputPane').textContent = item ? item.input : '';
   document.getElementById('historyResultPane').textContent = item ? item.result : '';
+  document.getElementById('historyCopyBtn').style.display = item ? '' : 'none';
 }
 
 function syncLangDropdowns() {

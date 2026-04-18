@@ -199,10 +199,15 @@
       <div class="tab-panel" id="tab-tab3">
         <div class="history-header">
           <span class="history-title">번역/교정 이력</span>
+          <span class="history-feedback" id="historyFeedback" style="display:none"></span>
           <button class="history-clear-btn" id="historyClearBtn">전체 삭제</button>
         </div>
         <div class="history-list" id="historyList">
           <div class="history-empty" id="historyEmpty">이력이 없습니다.</div>
+        </div>
+        <div id="historyUndoBar" class="history-undo-bar" style="display:none">
+          <span class="history-undo-msg">이력 1건이 삭제됐습니다.</span>
+          <button class="history-undo-btn" id="historyUndoBtn">되돌리기</button>
         </div>
         <div class="history-divider"></div>
         <div class="history-panels">
@@ -213,6 +218,7 @@
           <div class="history-pane">
             <div class="history-pane-label">결과</div>
             <div class="history-pane-text" id="historyResultPane"></div>
+            <button class="copy-btn" id="historyCopyBtn" style="display:none">복사</button>
           </div>
         </div>
       </div>
