@@ -1,5 +1,7 @@
 # LLM Translation & Grammar Correction
 
+[최신 버전 다운로드](https://github.com/Mistlud/gitworkspace_20260414/releases/latest)
+
 Google Vertex AI(Gemini)를 활용한 번역 및 문법 교정 데스크톱 앱.
 
 ## 실행 방법
