@@ -253,6 +253,14 @@ window.addEventListener('DOMContentLoaded', async () => {
     renderHistory(item.id);
   });
 
+  // Flip button
+  document.getElementById('flipBtn').addEventListener('click', () => {
+    const result = document.getElementById('resultText').textContent;
+    if (!result) return;
+    document.getElementById('inputText').value = result;
+    clearResult();
+  });
+
   // Copy button
   document.getElementById('copyBtn').addEventListener('click', () => {
     const text = document.getElementById('resultText').textContent;

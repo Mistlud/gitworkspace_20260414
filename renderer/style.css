@@ -1071,6 +1071,39 @@ textarea#inputText {
   background: #3a5a8a;
 }
 
+/* ── Flip Button ── */
+.flip-col {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  flex-shrink: 0;
+  background: rgba(30, 30, 46, var(--bg-alpha));
+}
+
+.flip-btn {
+  width: 22px;
+  height: 22px;
+  background: #2a2a45;
+  border: 1px solid #3a3a60;
+  border-radius: 5px;
+  color: #556;
+  font-size: 12px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.15s, color 0.15s, border-color 0.15s;
+  padding: 0;
+  line-height: 1;
+}
+
+.flip-btn:hover {
+  background: #3a3a60;
+  color: #7eb8f7;
+  border-color: #7eb8f7;
+}
+
 /* ── Tab 3: History ── */
 .history-header {
   display: flex;
