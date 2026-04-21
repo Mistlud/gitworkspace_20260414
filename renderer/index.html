@@ -43,7 +43,7 @@
 
       <!-- Tab 0: Home -->
       <div class="tab-panel active" id="tab-home">
-        <div class="home-wrap">
+        <div class="home-top">
           <div class="home-header">
             <div class="home-title">LLMTransTool</div>
             <div class="home-subtitle">Vertex AI 기반 번역 · 교정 도구</div>
@@ -53,37 +53,41 @@
               키가 없으면 번역·교정 기능을 사용할 수 없습니다.
             </p>
           </div>
+        </div>
+        <div class="home-scroll">
+          <div class="home-sections">
+            <div class="home-section">
+              <div class="home-section-title">사용 방법</div>
+              <ol class="home-steps">
+                <li><strong>설정</strong> 탭에서 Vertex AI 서비스 계정 JSON 키를 등록하세요. 한 번만 하면 이후 자동으로 복원됩니다.</li>
+                <li><strong>번역</strong> 탭에서 모드와 도착어를 선택하세요.</li>
+                <li>텍스트를 입력하고 <strong>전송</strong> 버튼을 누르세요. 단축키 Ctrl+Enter도 사용할 수 있습니다.</li>
+                <li>결과를 재번역하려면 패널 사이 <strong>⇐</strong> 버튼으로 결과를 입력창에 옮기세요.</li>
+              </ol>
+            </div>
 
-          <div class="home-section">
-            <div class="home-section-title">사용 방법</div>
-            <ol class="home-steps">
-              <li><strong>설정</strong> 탭에서 Vertex AI JSON 키를 등록하세요.</li>
-              <li><strong>번역</strong> 탭에서 모드를 선택하세요. 번역 모드는 도착어도 함께 선택합니다.</li>
-              <li>텍스트를 입력하고 <strong>전송</strong> 버튼을 누르세요. <strong>Ctrl+Enter</strong>로도 전송할 수 있습니다.</li>
-            </ol>
-          </div>
-
-          <div class="home-section">
-            <div class="home-section-title">번역 vs 교정</div>
-            <div class="home-mode-desc">
-              <div class="home-mode-item">
-                <span class="mode-badge">번역</span>
-                <span>텍스트를 선택한 도착어로 번역합니다.</span>
-              </div>
-              <div class="home-mode-item">
-                <span class="mode-badge grammar">교정</span>
-                <span>텍스트의 문법·철자·구두점을 교정합니다.</span>
+            <div class="home-section">
+              <div class="home-section-title">번역 vs 교정</div>
+              <div class="home-mode-desc">
+                <div class="home-mode-item">
+                  <span class="mode-badge">번역</span>
+                  <span>텍스트를 선택한 도착어로 번역합니다. 도착어 드롭다운에서 언어를 선택할 수 있습니다.</span>
+                </div>
+                <div class="home-mode-item">
+                  <span class="mode-badge grammar">교정</span>
+                  <span>언어를 자동 감지하여 문법·철자·구두점을 교정합니다. 도착어 선택 없이 바로 사용할 수 있습니다.</span>
+                </div>
               </div>
             </div>
-          </div>
 
-          <div class="home-section">
-            <div class="home-section-title">기타 기능</div>
-            <div class="home-misc-list">
-              <div class="home-misc-item"><span class="home-misc-key">이력</span>최근 번역·교정 결과 최대 10건 보관. 앱 종료 시 초기화됩니다.</div>
-              <div class="home-misc-item"><span class="home-misc-key">설정</span>모델, 토큰 수, 언어 목록, 번역·교정 프롬프트를 직접 편집할 수 있습니다.</div>
-              <div class="home-misc-item"><span class="home-misc-key">⊤</span>창을 항상 위에 고정합니다.</div>
-              <div class="home-misc-item"><span class="home-misc-key">◑</span>창 배경 투명도를 조절합니다.</div>
+            <div class="home-section">
+              <div class="home-section-title">기타 기능</div>
+              <div class="home-misc-list">
+                <div class="home-misc-item"><span class="home-misc-key">이력</span>번역·교정 결과를 최대 10건 자동 저장합니다. 항목을 클릭하면 입력과 결과를 함께 볼 수 있으며, 삭제한 항목은 즉시 되돌릴 수 있습니다. 앱 종료 시 초기화됩니다.</div>
+                <div class="home-misc-item"><span class="home-misc-key">설정</span>사용 모델, 최대 출력 토큰, 언어 목록, 번역·교정 프롬프트를 변경할 수 있습니다. JSON 키도 이 탭에서 관리합니다.</div>
+                <div class="home-misc-item"><span class="home-misc-key">📌</span>사이드바 하단 버튼. 클릭하면 창을 항상 위에 고정합니다. 활성 시 파란색으로 표시됩니다.</div>
+                <div class="home-misc-item"><span class="home-misc-key">🔆</span>사이드바 하단 버튼. 클릭하면 창 배경 투명도 슬라이더가 나타납니다. 20~100% 범위에서 조절할 수 있습니다.</div>
+              </div>
             </div>
           </div>
         </div>
@@ -110,9 +114,7 @@
             <textarea id="inputText" placeholder="텍스트를 입력하세요..."></textarea>
             <button class="clear-btn" id="clearInputBtn">지우기</button>
           </div>
-          <div class="flip-col">
-            <button class="flip-btn" id="flipBtn" title="결과를 입력창으로">⇐</button>
-          </div>
+          <button class="flip-btn" id="flipBtn" title="결과를 입력창으로">⇐</button>
           <div class="panel result-panel">
             <div id="resultText" class="result-text"></div>
             <button class="copy-btn" id="copyBtn" style="display:none">복사</button>

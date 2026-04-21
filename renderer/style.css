@@ -358,6 +358,7 @@ html, body {
   overflow: hidden;
   gap: 1px;
   background: rgba(42, 42, 69, var(--bg-alpha));
+  position: relative;
 }
 
 .panel {
@@ -382,6 +383,17 @@ textarea#inputText {
   line-height: 1.7;
   font-family: inherit;
   padding: 16px;
+  scrollbar-width: thin;
+  scrollbar-color: #3a3a60 transparent;
+}
+
+textarea#inputText::-webkit-scrollbar {
+  width: 4px;
+}
+
+textarea#inputText::-webkit-scrollbar-thumb {
+  background: #3a3a60;
+  border-radius: 2px;
 }
 
 .result-panel {
@@ -397,6 +409,17 @@ textarea#inputText {
   white-space: pre-wrap;
   overflow-y: auto;
   height: 100%;
+  scrollbar-width: thin;
+  scrollbar-color: #3a3a60 transparent;
+}
+
+.result-text::-webkit-scrollbar {
+  width: 4px;
+}
+
+.result-text::-webkit-scrollbar-thumb {
+  background: #3a3a60;
+  border-radius: 2px;
 }
 
 .clear-btn {
@@ -475,68 +498,88 @@ textarea#inputText {
 }
 
 /* ── Tab 0: Home ── */
-.home-wrap {
-  padding: 40px 36px;
-  display: flex;
+#tab-home {
   flex-direction: column;
-  gap: 32px;
-  overflow-y: auto;
-  height: 100%;
-  scrollbar-width: thin;
-  scrollbar-color: #3a3a60 transparent;
+  overflow: hidden;
 }
 
-.home-wrap::-webkit-scrollbar {
-  width: 4px;
-}
-
-.home-wrap::-webkit-scrollbar-thumb {
-  background: #3a3a60;
-  border-radius: 2px;
+.home-top {
+  flex-shrink: 0;
+  display: flex;
+  justify-content: center;
+  padding: 24px 24px 12px;
 }
 
 .home-header {
+  width: 660px;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 8px;
-  padding-bottom: 28px;
-  border-bottom: 1px solid #2a2a45;
+  padding: 24px 32px;
+  text-align: center;
+}
+
+.home-scroll {
+  flex: 1;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #3a3a60 transparent;
+}
+
+.home-scroll::-webkit-scrollbar {
+  width: 4px;
+}
+
+.home-scroll::-webkit-scrollbar-thumb {
+  background: #3a3a60;
+  border-radius: 2px;
+}
+
+.home-sections {
+  width: 660px;
+  margin: 0 auto;
+  padding: 0 0 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .home-title {
-  font-size: 26px;
+  font-size: 22px;
   font-weight: 700;
   color: #c0d0e8;
   letter-spacing: 1px;
 }
 
 .home-subtitle {
-  font-size: 13px;
-  color: #556;
-  margin-bottom: 4px;
+  font-size: 12px;
+  color: #4a4a6a;
 }
 
 .home-key-hint {
   font-size: 12px;
   color: #c08040;
-  text-align: center;
   line-height: 1.7;
   margin-top: 4px;
 }
 
 .home-section {
+  background: rgba(22, 22, 42, 0.5);
+  border: 1px solid #2a2a45;
+  border-radius: 10px;
+  padding: 20px 24px;
   display: flex;
   flex-direction: column;
   gap: 14px;
 }
 
 .home-section-title {
-  font-size: 11px;
-  font-weight: 600;
-  color: #778;
+  font-size: 10px;
+  font-weight: 700;
+  color: #556;
   text-transform: uppercase;
-  letter-spacing: 0.5px;
+  letter-spacing: 0.8px;
 }
 
 .home-steps {
@@ -544,7 +587,7 @@ textarea#inputText {
   counter-reset: step;
   display: flex;
   flex-direction: column;
-  gap: 10px;
+  gap: 12px;
   padding: 0;
 }
 
@@ -554,50 +597,25 @@ textarea#inputText {
   align-items: flex-start;
   gap: 12px;
   font-size: 13px;
-  color: #aaa;
-  line-height: 1.6;
+  color: #9aa;
+  line-height: 1.65;
 }
 
 .home-steps li::before {
   content: counter(step);
-  min-width: 22px;
-  height: 22px;
-  background: #2a2a45;
-  border: 1px solid #3a3a60;
+  min-width: 20px;
+  height: 20px;
+  background: #1e2a3a;
+  border: 1px solid #3a4a60;
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 11px;
+  font-size: 10px;
   font-weight: 700;
   color: #7eb8f7;
   flex-shrink: 0;
-  margin-top: 1px;
-}
-
-.home-misc-list {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.home-misc-item {
-  display: flex;
-  align-items: baseline;
-  gap: 12px;
-  font-size: 13px;
-  color: #aaa;
-  line-height: 1.6;
-}
-
-.home-misc-key {
-  font-size: 11px;
-  font-weight: 700;
-  color: #778;
-  white-space: nowrap;
-  min-width: 36px;
-  text-align: right;
-  flex-shrink: 0;
+  margin-top: 2px;
 }
 
 .home-mode-desc {
@@ -608,10 +626,41 @@ textarea#inputText {
 
 .home-mode-item {
   display: flex;
-  align-items: center;
+  align-items: flex-start;
   gap: 12px;
   font-size: 13px;
-  color: #aaa;
+  color: #9aa;
+  line-height: 1.65;
+}
+
+.home-mode-item .mode-badge {
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
+.home-misc-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.home-misc-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  font-size: 13px;
+  color: #9aa;
+  line-height: 1.65;
+}
+
+.home-misc-key {
+  font-size: 14px;
+  color: #7eb8f7;
+  white-space: nowrap;
+  min-width: 28px;
+  text-align: center;
+  flex-shrink: 0;
+  margin-top: 1px;
 }
 
 /* ── Tab 2: Settings ── */
@@ -1072,19 +1121,15 @@ textarea#inputText {
 }
 
 /* ── Flip Button ── */
-.flip-col {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 28px;
-  flex-shrink: 0;
-  background: rgba(30, 30, 46, var(--bg-alpha));
-}
-
 .flip-btn {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
   width: 22px;
   height: 22px;
-  background: #2a2a45;
+  background: #1e1e2e;
   border: 1px solid #3a3a60;
   border-radius: 5px;
   color: #556;
@@ -1099,7 +1144,7 @@ textarea#inputText {
 }
 
 .flip-btn:hover {
-  background: #3a3a60;
+  background: #2a2a45;
   color: #7eb8f7;
   border-color: #7eb8f7;
 }
