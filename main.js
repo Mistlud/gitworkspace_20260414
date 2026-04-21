@@ -6,7 +6,7 @@ const { GoogleAuth } = require('google-auth-library');
 const keyFilePath = () => path.join(app.getPath('userData'), 'saved-key.bin');
 const promptsFilePath = () => app.isPackaged
   ? path.join(process.resourcesPath, 'prompts.json')
-  : promptsFilePath();
+  : path.join(__dirname, 'prompts.json');
 const windowStatePath = () => path.join(app.getPath('userData'), 'window-state.json');
 
 function loadWindowState() {
