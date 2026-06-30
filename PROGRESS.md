@@ -204,12 +204,19 @@
   - OpenAI: `● {프로필명} — {모델}` / `⚠ 프로파일 미선택`
 - `renderer.js`: `applyProvider()`, `updateIndicator()`, `renderProfiles()`, `openProfileForm()`, `saveProfile()` 함수 추가
 
+
 #### 저장 구조
 | 파일 | 내용 |
 |------|------|
 | `app-config.json` | `provider`, `activeProfileId`, `profiles[]` (이름/엔드포인트/모델/hasKey) |
 | `custom-key-{id}.bin` | 프로필별 API 키 개별 암호화 |
 | `saved-key.bin` | Vertex AI JSON 키 (기존 유지) |
+
+#### 버그 수정
+- **이력 탭 레이아웃 찌그러짐 및 스크롤 오버플로우 문제 해결**:
+  - 이력 카드(`.history-card`)가 세로 높이가 좁아질 때 축소되지 않도록 `flex-shrink: 0` 적용.
+  - 이력 목록(`.history-list`)과 상세 이력 패널(`.history-panels`)의 Flex 크기 지정 방식 개선 (`flex: 3`, `flex: 7`로 명시적 비율 분리).
+  - 목록과 상세 패널이 영역 밖으로 밀려 스크롤이 무력화되지 않도록 `min-height: 0` 속성을 각각 추가하여 개별 영역 내에서 스크롤바가 정상 활성화되도록 수정.
 
 ---
 

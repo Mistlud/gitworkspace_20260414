@@ -1471,7 +1471,8 @@ textarea#inputText::-webkit-scrollbar-thumb {
   gap: 6px;
   scrollbar-width: thin;
   scrollbar-color: #3a3a60 transparent;
-  flex: 0 0 30%;
+  flex: 3;
+  min-height: 0;
 }
 
 .history-list::-webkit-scrollbar {
@@ -1499,11 +1500,12 @@ textarea#inputText::-webkit-scrollbar-thumb {
 }
 
 .history-panels {
-  flex: 1;
+  flex: 7;
   display: flex;
   overflow: hidden;
   gap: 1px;
   background: rgba(42, 42, 69, var(--bg-alpha));
+  min-height: 0;
 }
 
 .history-pane {
@@ -1552,6 +1554,7 @@ textarea#inputText::-webkit-scrollbar-thumb {
   overflow: hidden;
   cursor: pointer;
   transition: border-color 0.15s;
+  flex-shrink: 0;
 }
 
 .history-card:hover {
