@@ -1,6 +1,6 @@
 {
   "name": "llm-translation-app",
-  "version": "0.9.1",
+  "version": "0.9.2",
   "description": "Desktop app for translation and grammar correction via Vertex AI",
   "main": "main.js",
   "scripts": {
