@@ -136,7 +136,18 @@
       <!-- Tab 2: Settings -->
       <div class="tab-panel" id="tab-settings">
         <div class="settings-wrap">
-          <h2>Vertex AI 설정</h2>
+
+          <!-- API Provider 선택 -->
+          <div class="settings-section">
+            <label class="settings-label">API Provider</label>
+            <div class="provider-toggle" id="providerToggle">
+              <button class="provider-btn active" data-provider="vertex" id="providerBtnVertex">Vertex AI</button>
+              <button class="provider-btn" data-provider="openai" id="providerBtnOpenai">OpenAI Compatible</button>
+            </div>
+          </div>
+
+          <!-- Vertex AI 설정 영역 -->
+          <div id="vertexSection">
           <div class="settings-section">
             <label class="settings-label">JSON 키</label>
 
@@ -181,9 +192,53 @@
             </div>
             <div id="tokensFeedback" class="key-feedback" style="display:none"></div>
           </div>
+          </div><!-- /vertexSection -->
+
+          <!-- OpenAI Compatible 설정 영역 -->
+          <div id="openaiSection" style="display:none">
+            <div class="settings-section">
+              <div class="profile-list-header">
+                <label class="settings-label">프로필 목록</label>
+                <button id="addProfileBtn" class="profile-add-btn">+ 추가</button>
+              </div>
+              <div id="profileList" class="profile-list">
+                <div class="profile-empty" id="profileEmpty">프로필이 없습니다. + 추가를 눌러 등록하세요.</div>
+              </div>
+            </div>
+
+            <!-- 추가/수정 폼 (기본 숨김) -->
+            <div class="settings-section" id="profileFormSection" style="display:none">
+              <label class="settings-label" id="profileFormTitle">프로필 추가</label>
+              <div class="profile-form">
+                <input type="hidden" id="profileEditId" />
+                <input type="text" id="profileNameInput" class="custom-text-input" placeholder="이름 (예: OpenAI GPT-4o)" />
+                <input type="text" id="profileEndpointInput" class="custom-text-input" placeholder="https://api.openai.com/v1/chat/completions" />
+                <input type="text" id="profileModelInput" class="custom-text-input" placeholder="모델명 (예: gpt-4o)" />
+                <input type="password" id="profileKeyInput" class="custom-text-input" placeholder="API Key (저장된 키 유지 시 공백)" autocomplete="off" />
+                <div class="profile-form-actions">
+                  <button id="profileSaveBtn" class="save-key-btn">저장</button>
+                  <button id="profileCancelBtn" class="profile-cancel-btn">취소</button>
+                </div>
+                <div id="profileFormFeedback" class="key-feedback" style="display:none"></div>
+              </div>
+            </div>
+          </div><!-- /openaiSection -->
+
+
+          <div class="settings-section">
+            <label class="settings-label">온도 (Temperature)</label>
+            <div class="tokens-row">
+              <input type="number" id="temperatureInput" class="tokens-input"
+                min="0" max="2" step="0.01" placeholder="미설정" style="width:110px" />
+              <button id="temperatureSaveBtn" class="tokens-save-btn">저장</button>
+            </div>
+            <div style="font-size:11px; color:#445; margin-top:4px;">비워두면 파라미터를 전송하지 않습니다.</div>
+            <div id="temperatureFeedback" class="key-feedback" style="display:none"></div>
+          </div>
 
           <div class="settings-section">
             <label class="settings-label">언어 목록</label>
+
             <div class="lang-box">
               <div id="langList" class="lang-list"></div>
               <div class="lang-add-row">

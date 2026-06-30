@@ -1,5 +1,6 @@
 let prompts = {};
-let hasSavedKey = false;
+let hasSavedKey = false;  // Vertex AI
+let appConfig = { provider: 'vertex', profiles: [], activeProfileId: null };
 let currentMode = 'translation';
 const history = [];
 let lastDeleted = null;
@@ -9,8 +10,14 @@ const LOCKED_LANGS = ['Korean', 'English'];
 window.addEventListener('DOMContentLoaded', async () => {
   prompts = await window.api.getPrompts();
 
-  // Check for saved key
+  // ── App config + 프로파일 로드
+  appConfig = await window.api.loadAppConfig();
+  applyProvider(appConfig.provider || 'vertex');
+  renderProfiles();
+
+  // ── Vertex AI 키 상태
   const keyState = await window.api.loadKey();
+  hasSavedKey = keyState.exists;
   updateKeyUI(keyState);
 
   // Populate target language dropdown
@@ -133,8 +140,29 @@ window.addEventListener('DOMContentLoaded', async () => {
   // Delete key button
   document.getElementById('deleteKeyBtn').addEventListener('click', async () => {
     await window.api.deleteKey();
+    hasSavedKey = false;
     updateKeyUI({ exists: false });
   });
+
+  // ── Provider 토글
+  document.querySelectorAll('.provider-btn').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      const p = btn.dataset.provider;
+      appConfig.provider = p;
+      await window.api.saveAppConfig(appConfig);
+      applyProvider(p);
+      updateIndicator();
+    });
+  });
+
+  // ── 프로파일 추가 버튼
+  document.getElementById('addProfileBtn').addEventListener('click', () => openProfileForm());
+
+  // ── 프로파일 폼 저장
+  document.getElementById('profileSaveBtn').addEventListener('click', saveProfile);
+
+  // ── 프로파일 폼 취소
+  document.getElementById('profileCancelBtn').addEventListener('click', closeProfileForm);
 
   // Prompt editors
   document.getElementById('translationPrompt').value = prompts.translation || '';
@@ -187,7 +215,42 @@ window.addEventListener('DOMContentLoaded', async () => {
     await window.api.savePrompts(prompts);
   });
 
+  // Temperature
+  const temperatureInput = document.getElementById('temperatureInput');
+  temperatureInput.value = prompts.temperature != null ? prompts.temperature : '';
+
+  document.getElementById('temperatureSaveBtn').addEventListener('click', async () => {
+    const raw = temperatureInput.value.trim();
+    const feedback = document.getElementById('temperatureFeedback');
+
+    if (raw === '') {
+      // 비워두면 파라미터 제거
+      delete prompts.temperature;
+      await window.api.savePrompts(prompts);
+      feedback.textContent = '✓ 온도 파라미터를 전송하지 않도록 설정됨';
+      feedback.className = 'key-feedback ok';
+      feedback.style.display = '';
+      setTimeout(() => { feedback.style.display = 'none'; }, 2500);
+      return;
+    }
+
+    const val = parseFloat(raw);
+    if (isNaN(val) || val < 0 || val > 2) {
+      feedback.textContent = '✗ 0.0 ~ 2.0 사이의 값을 입력해주세요.';
+      feedback.className = 'key-feedback error';
+      feedback.style.display = '';
+      return;
+    }
+    prompts.temperature = val;
+    await window.api.savePrompts(prompts);
+    feedback.textContent = `✓ 온도 ${val} 저장됨`;
+    feedback.className = 'key-feedback ok';
+    feedback.style.display = '';
+    setTimeout(() => { feedback.style.display = 'none'; }, 2500);
+  });
+
   // Language management
+
   renderLangList();
 
   document.getElementById('langAddBtn').addEventListener('click', () => {
@@ -280,6 +343,59 @@ function applyOpacity(value) {
 }
 
 
+function applyProvider(provider) {
+  document.getElementById('vertexSection').style.display  = provider === 'vertex' ? '' : 'none';
+  document.getElementById('openaiSection').style.display  = provider === 'openai' ? '' : 'none';
+  document.querySelectorAll('.provider-btn').forEach((btn) => {
+    btn.classList.toggle('active', btn.dataset.provider === provider);
+  });
+  updateIndicator();
+}
+
+// provider + key/profile 상태에 따른 인디케이터 업데이트
+function updateIndicator() {
+  const provider = appConfig.provider || 'vertex';
+  const indicator = document.getElementById('keyIndicator');
+  const homeIndicator = document.getElementById('homeKeyIndicator');
+  const homeKeyHint   = document.getElementById('homeKeyHint');
+
+  let text, cls, showHint;
+
+  if (provider === 'vertex') {
+    if (hasSavedKey) {
+      text = '● Vertex AI';
+      cls  = 'key-indicator ok';
+      showHint = false;
+    } else {
+      text = '⚠ Vertex AI 키 미설정';
+      cls  = 'key-indicator missing';
+      showHint = true;
+    }
+  } else {
+    const activeId  = appConfig.activeProfileId;
+    const profile   = (appConfig.profiles || []).find(p => p.id === activeId);
+    if (profile && profile.hasKey) {
+      text = `● ${profile.name} — ${profile.model}`;
+      cls  = 'key-indicator ok';
+      showHint = false;
+    } else if (profile) {
+      text = `⚠ ${profile.name} (키 없음)`;
+      cls  = 'key-indicator missing';
+      showHint = true;
+    } else {
+      text = '⚠ 프로파일 미선택';
+      cls  = 'key-indicator missing';
+      showHint = true;
+    }
+  }
+
+  indicator.textContent = text;
+  indicator.className   = cls;
+  homeIndicator.textContent = text;
+  homeIndicator.className   = cls;
+  homeKeyHint.style.display = showHint ? '' : 'none';
+}
+
 function updateModeToggle() {
   document.querySelectorAll('.mode-switch-label').forEach((label) => {
     label.classList.toggle('active', label.dataset.mode === currentMode);
@@ -316,47 +432,42 @@ function validateKey(raw) {
 function updateKeyUI(state) {
   hasSavedKey = state.exists;
   const savedDisplay = document.getElementById('savedKeyDisplay');
-  const inputArea = document.getElementById('keyInputArea');
-  const indicator = document.getElementById('keyIndicator');
-  const homeIndicator = document.getElementById('homeKeyIndicator');
-  const homeKeyHint = document.getElementById('homeKeyHint');
+  const inputArea    = document.getElementById('keyInputArea');
 
   if (state.exists) {
     document.getElementById('savedProjectId').textContent = state.projectId;
     savedDisplay.style.display = '';
-    inputArea.style.display = 'none';
-    indicator.textContent = '● 키 설정됨';
-    indicator.className = 'key-indicator ok';
-    homeIndicator.textContent = '● 키 설정됨';
-    homeIndicator.className = 'key-indicator ok';
-    homeKeyHint.style.display = 'none';
+    inputArea.style.display    = 'none';
   } else {
     savedDisplay.style.display = 'none';
-    inputArea.style.display = '';
-    // Reset input area
+    inputArea.style.display    = '';
     document.getElementById('keyTextarea').value = '';
     document.getElementById('fileStatus').textContent = '선택된 파일 없음';
     document.getElementById('keyFeedback').style.display = 'none';
-    document.getElementById('saveKeyBtn').style.display = 'none';
-    indicator.textContent = '⚠ 키 미설정';
-    indicator.className = 'key-indicator missing';
-    homeIndicator.textContent = '⚠ 키 미설정';
-    homeIndicator.className = 'key-indicator missing';
-    homeKeyHint.style.display = '';
+    document.getElementById('saveKeyBtn').style.display  = 'none';
   }
+  updateIndicator();
 }
 
 async function handleSubmit() {
-  const keyJson = hasSavedKey ? '' : document.getElementById('keyTextarea').value.trim();
-  if (!hasSavedKey && !keyJson) return showError('설정 탭에서 Vertex AI JSON 키를 먼저 입력해주세요.');
+  const provider = appConfig.provider || 'vertex';
+
+  if (provider === 'vertex' && !hasSavedKey) {
+    return showError('설정 탭에서 Vertex AI JSON 키를 먼저 등록해주세요.');
+  }
+  if (provider === 'openai') {
+    const activeId = appConfig.activeProfileId;
+    const profile  = (appConfig.profiles || []).find(p => p.id === activeId);
+    if (!profile)          return showError('설정 탭에서 활성 프로파일을 선택해주세요.');
+    if (!profile.hasKey)   return showError(`"${profile.name}" 프로파일의 API 키가 없습니다. 프로파일을 수정해 키를 등록해주세요.`);
+  }
 
   const targetLang = document.getElementById('targetLang').value;
-  const inputText = document.getElementById('inputText').value.trim();
-
+  const inputText  = document.getElementById('inputText').value.trim();
   if (!inputText) return showError('텍스트를 입력해주세요.');
 
   const systemPrompt = prompts[currentMode] || '';
-  const userMessage = currentMode === 'translation'
+  const userMessage  = currentMode === 'translation'
     ? `Target language: ${targetLang}\n\nText:\n${inputText}`
     : `Text:\n${inputText}`;
 
@@ -364,22 +475,148 @@ async function handleSubmit() {
   clearResult();
   setLoading(true);
 
-  const response = await window.api.sendToVertex({ keyJson, systemPrompt, userMessage });
+  const response = await window.api.sendToLlm({ systemPrompt, userMessage });
 
   setLoading(false);
 
   if (response.success) {
     showError('');
     showResult(response.result);
-    addHistory({
-      targetLang,
-      mode: currentMode,
-      input: inputText,
-      result: response.result
-    });
+    addHistory({ targetLang, mode: currentMode, input: inputText, result: response.result });
   } else {
     showError(`오류: ${response.error}`, true);
   }
+}
+
+// ─── 프로필 관리 ────────────────────────────────────────────────────────────
+function renderProfiles() {
+  const list    = document.getElementById('profileList');
+  const empty   = document.getElementById('profileEmpty');
+  const profiles = appConfig.profiles || [];
+  const activeId = appConfig.activeProfileId;
+
+  // 카드만 제거 (empty 메시지는 유지)
+  list.querySelectorAll('.profile-card').forEach(el => el.remove());
+
+  if (profiles.length === 0) {
+    empty.style.display = '';
+    return;
+  }
+  empty.style.display = 'none';
+
+  profiles.forEach((profile) => {
+    const isActive = profile.id === activeId;
+    const card = document.createElement('div');
+    card.className = 'profile-card' + (isActive ? ' active' : '');
+    card.dataset.id = profile.id;
+
+    const endpointShort = (profile.endpoint || '').replace(/^https?:\/\//, '').slice(0, 40);
+
+    card.innerHTML = `
+      <span class="profile-radio">${isActive ? '●' : '○'}</span>
+      <div class="profile-info">
+        <div class="profile-name">${profile.name}</div>
+        <div class="profile-sub">${profile.model} · ${endpointShort}</div>
+      </div>
+      <span class="profile-key-badge ${profile.hasKey ? 'has-key' : 'no-key'}">${profile.hasKey ? '키 있음' : '키 없음'}</span>
+      <div class="profile-actions">
+        <button class="profile-edit-btn">수정</button>
+        <button class="profile-delete-btn">삭제</button>
+      </div>
+    `;
+
+    // 카드 클릭 → 활성 프로필 선택
+    card.addEventListener('click', async (e) => {
+      if (e.target.closest('.profile-actions')) return;
+      appConfig.activeProfileId = profile.id;
+      await window.api.setActiveProfile(profile.id);
+      renderProfiles();
+      updateIndicator();
+    });
+
+    card.querySelector('.profile-edit-btn').addEventListener('click', (e) => {
+      e.stopPropagation();
+      openProfileForm(profile);
+    });
+
+    card.querySelector('.profile-delete-btn').addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const res = await window.api.deleteProfile(profile.id);
+      if (res.success) {
+        appConfig = res.config;
+        renderProfiles();
+        updateIndicator();
+      }
+    });
+
+    list.appendChild(card);
+  });
+}
+
+function openProfileForm(profile = null) {
+  const formSection = document.getElementById('profileFormSection');
+  const title       = document.getElementById('profileFormTitle');
+  formSection.style.display = '';
+  document.getElementById('profileFormFeedback').style.display = 'none';
+
+  if (profile) {
+    title.textContent = '프로필 수정';
+    document.getElementById('profileEditId').value          = profile.id;
+    document.getElementById('profileNameInput').value       = profile.name;
+    document.getElementById('profileEndpointInput').value   = profile.endpoint;
+    document.getElementById('profileModelInput').value      = profile.model;
+    document.getElementById('profileKeyInput').value        = '';
+  } else {
+    title.textContent = '프로필 추가';
+    document.getElementById('profileEditId').value          = '';
+    document.getElementById('profileNameInput').value       = '';
+    document.getElementById('profileEndpointInput').value   = '';
+    document.getElementById('profileModelInput').value      = '';
+    document.getElementById('profileKeyInput').value        = '';
+  }
+}
+
+function closeProfileForm() {
+  document.getElementById('profileFormSection').style.display = 'none';
+}
+
+async function saveProfile() {
+  const editId   = document.getElementById('profileEditId').value.trim();
+  const name     = document.getElementById('profileNameInput').value.trim();
+  const endpoint = document.getElementById('profileEndpointInput').value.trim();
+  const model    = document.getElementById('profileModelInput').value.trim();
+  const apiKey   = document.getElementById('profileKeyInput').value.trim();
+  const feedback = document.getElementById('profileFormFeedback');
+
+  if (!name || !endpoint || !model) {
+    feedback.textContent = '✗ 이름, Endpoint, Model은 필수입니다.';
+    feedback.className = 'key-feedback error';
+    feedback.style.display = '';
+    return;
+  }
+
+  // 새 프로필이면 ID 생성
+  const id = editId || `p-${Date.now()}`;
+  const profile = { id, name, endpoint, model };
+
+  const res = await window.api.saveProfile({ profile, apiKey: apiKey || null });
+  if (!res.success) {
+    feedback.textContent = `✗ 저장 실패: ${res.error}`;
+    feedback.className = 'key-feedback error';
+    feedback.style.display = '';
+    return;
+  }
+
+  appConfig = res.config;
+  // 첫 프로필이거나 현재 활성이 없으면 자동 활성화
+  if (!appConfig.activeProfileId) {
+    appConfig.activeProfileId = id;
+    await window.api.setActiveProfile(id);
+  }
+
+  closeProfileForm();
+  renderProfiles();
+  updateIndicator();
 }
 
 function setLoading(on) {

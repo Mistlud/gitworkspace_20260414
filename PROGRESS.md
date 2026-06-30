@@ -173,6 +173,46 @@
 
 ---
 
+### SubPLAN — Multi-Provider & Multi-Profile Support (2026-06-30)
+
+#### 백엔드 (`main.js`, `preload.js`)
+- `send-to-vertex` 제거 → `send-to-llm` 통합 핸들러로 교체
+  - `app-config.json`의 `provider` 필드 기준으로 Vertex AI / OpenAI Compatible 분기
+- Vertex AI 분기: 기존 로직 유지, `temperature` 조건부 전송 (null이면 파라미터 생략)
+- OpenAI Compatible 분기: 멀티 프로필 기반
+  - `activeProfileId`로 활성 프로필 조회
+  - 프로필별 API 키 → `custom-key-{id}.bin` 개별 암호화 저장 (safeStorage)
+  - `max_tokens` 파라미터 제거, `temperature` 조건부 전송
+- 신규 IPC 핸들러: `save-profile`, `delete-profile`, `set-active-profile`
+- `preload.js`: `sendToLlm`, `saveProfile`, `deleteProfile`, `setActiveProfile`, `loadAppConfig`, `saveAppConfig` 노출
+
+#### 프론트엔드 (`renderer/`)
+- 설정 탭 전면 재구성:
+  - **API Provider 토글**: `Vertex AI` / `OpenAI Compatible` 세그먼트 버튼
+  - **Vertex 섹션**: 기존 JSON 키 + 모델/토큰 설정 유지
+  - **OpenAI 섹션**: 프로필 목록 카드 UI
+    - 프로필 카드: 이름 · 모델 · 엔드포인트 미리보기 · 키 있음/없음 뱃지
+    - 카드 클릭 → 활성 프로필 전환 (파란 테두리 강조)
+    - 수정/삭제 버튼 각 카드 우측
+    - `+ 추가` 버튼 → 인라인 폼 (이름/Endpoint/Model/API Key)
+    - 첫 프로필 저장 시 자동 활성화
+  - **온도 (Temperature)** 직접 입력 (공통 섹션):
+    - 0.0 ~ 2.0 범위 숫자 입력
+    - 비워두면 요청 body에서 파라미터 자체를 제거
+- 번역 탭 / 홈 탭 **키 상태 인디케이터** provider-aware 갱신:
+  - Vertex AI: `● Vertex AI` / `⚠ Vertex AI 키 미설정`
+  - OpenAI: `● {프로필명} — {모델}` / `⚠ 프로파일 미선택`
+- `renderer.js`: `applyProvider()`, `updateIndicator()`, `renderProfiles()`, `openProfileForm()`, `saveProfile()` 함수 추가
+
+#### 저장 구조
+| 파일 | 내용 |
+|------|------|
+| `app-config.json` | `provider`, `activeProfileId`, `profiles[]` (이름/엔드포인트/모델/hasKey) |
+| `custom-key-{id}.bin` | 프로필별 API 키 개별 암호화 |
+| `saved-key.bin` | Vertex AI JSON 키 (기존 유지) |
+
+---
+
 ## Pending
 
 ### Phase 2 — UX 개선
@@ -182,14 +222,14 @@
 ### Phase 4 — 기능 확장
 - 앱 이름 결정
 - 기타 탭 용도 결정
-- ~~뒤집기 버튼~~ → 완료 (재구현: 결과→입력 이동 방식)
+- ~~뒤집기 버튼~~ → 완료
 - ~~최초 실행 시 홈 탭 추가~~ → 완료
 - ~~이력 탭 추가~~ → 완료
-- ~~프롬프트 내용 검토~~ → 완료 (구조 검토 후 모드 스위치 방식으로 개선)
+- ~~프롬프트 내용 검토~~ → 완료
 - ~~창 투명도 조절~~ → 완료
 - ~~`Ctrl+Enter` 전송 단축키~~ → 완료
 - ~~탭 전환 키보드 단축키~~ → 폐기
-- ~~사이드바 하단 버튼 아이콘 조정~~ → 폐기 (📌 / 🔆 / ✕ 현행 유지)
+- ~~Multi-Provider / Multi-Profile (SubPLAN)~~ → 완료 (2026-06-30)
 
 ### Phase 5 — 배포
 - ~~electron-builder 설정 (포터블 ZIP 형태)~~ → 완료 (v0.9.0, 동작 확인)

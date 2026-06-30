@@ -1010,6 +1010,245 @@ textarea#inputText::-webkit-scrollbar-thumb {
   border-color: #7eb8f7;
 }
 
+/* ── API Provider Toggle ── */
+.provider-toggle {
+  display: flex;
+  background: #16162a;
+  border: 1px solid #3a3a60;
+  border-radius: 6px;
+  overflow: hidden;
+  align-self: flex-start;
+}
+
+.provider-btn {
+  padding: 7px 20px;
+  background: transparent;
+  border: none;
+  color: #556;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.provider-btn:hover {
+  background: #2a2a45;
+  color: #aaa;
+}
+
+.provider-btn.active {
+  background: #2a4a6a;
+  color: #7eb8f7;
+}
+
+/* ── Custom Text Input (OpenAI section) ── */
+.custom-text-input {
+  width: 100%;
+  background: #16162a;
+  border: 1px solid #3a3a60;
+  border-radius: 6px;
+  color: #ccc;
+  font-size: 13px;
+  font-family: inherit;
+  padding: 8px 12px;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.custom-text-input:focus {
+  border-color: #7eb8f7;
+}
+
+.custom-text-input::placeholder {
+  color: #3a3a5a;
+}
+
+/* ── Profile List ── */
+.profile-list-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 8px;
+}
+
+.profile-add-btn {
+  padding: 4px 12px;
+  background: #2a4a6a;
+  border: none;
+  border-radius: 5px;
+  color: #7eb8f7;
+  font-size: 12px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.profile-add-btn:hover {
+  background: #3a5a8a;
+}
+
+.profile-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.profile-empty {
+  font-size: 12px;
+  color: #445;
+  padding: 10px 0;
+}
+
+.profile-card {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 10px 14px;
+  background: #16162a;
+  border: 1px solid #2a2a45;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: border-color 0.15s, background 0.15s;
+}
+
+.profile-card:hover {
+  border-color: #3a3a60;
+  background: #1e1e38;
+}
+
+.profile-card.active {
+  border-color: #4a90e2;
+  background: #1a2535;
+}
+
+.profile-radio {
+  font-size: 14px;
+  color: #445;
+  flex-shrink: 0;
+  width: 16px;
+  text-align: center;
+}
+
+.profile-card.active .profile-radio {
+  color: #7eb8f7;
+}
+
+.profile-info {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.profile-name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #ccc;
+}
+
+.profile-card.active .profile-name {
+  color: #7eb8f7;
+}
+
+.profile-sub {
+  font-size: 11px;
+  color: #556;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.profile-key-badge {
+  font-size: 10px;
+  padding: 1px 7px;
+  border-radius: 8px;
+  font-weight: 600;
+  flex-shrink: 0;
+}
+
+.profile-key-badge.has-key {
+  background: #1a3a2a;
+  color: #6fcf97;
+  border: 1px solid #2a5a3a;
+}
+
+.profile-key-badge.no-key {
+  background: #3a2a1a;
+  color: #f0a060;
+  border: 1px solid #6a4a1a;
+}
+
+.profile-actions {
+  display: flex;
+  gap: 6px;
+  flex-shrink: 0;
+}
+
+.profile-edit-btn,
+.profile-delete-btn {
+  padding: 3px 10px;
+  border-radius: 5px;
+  font-size: 11px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.profile-edit-btn {
+  background: transparent;
+  border: 1px solid #3a3a60;
+  color: #778;
+}
+
+.profile-edit-btn:hover {
+  background: #2a2a45;
+  color: #aaa;
+}
+
+.profile-delete-btn {
+  background: transparent;
+  border: 1px solid #7a2a2a;
+  color: #f08080;
+}
+
+.profile-delete-btn:hover {
+  background: #3a1a1a;
+  color: #ff9999;
+}
+
+/* ── Profile Form ── */
+.profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.profile-form-actions {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.profile-cancel-btn {
+  padding: 6px 16px;
+  background: transparent;
+  border: 1px solid #3a3a60;
+  border-radius: 6px;
+  color: #778;
+  font-size: 13px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.profile-cancel-btn:hover {
+  background: #2a2a45;
+  color: #aaa;
+}
+
 /* ── Language List ── */
 .settings-section + .settings-section {
   margin-top: 28px;
