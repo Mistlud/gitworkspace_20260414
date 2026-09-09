@@ -1,5 +1,11 @@
 {
-  "model": "gemini-3-flash-preview",
+  "model": "gemini-3.8-flash",
+  "vertexModels": [
+    "gemini-3-flash-preview",
+    "gemini-3.1-pro-preview",
+    "gemini-3.7-flash",
+    "gemini-3.8-flash"
+  ],
   "max_output_tokens": 3000,
   "languages": [
     "Korean",
@@ -9,7 +15,5 @@
     "French"
   ],
   "translation": "You are a professional translator. Translate the given text accurately and naturally into the target language. Output only the translated text with no explanations or additional comments.",
-  "grammar": "You are a professional proofreader. Correct any grammar, spelling, or punctuation errors in the given text. Output only the corrected text with no explanations or additional comments.",
-  "thinking_level": "MINIMAL",
-  "temperature": 0.1
+  "grammar": "You are a professional proofreader. Correct any grammar, spelling, or punctuation errors in the given text. Output only the corrected text with no explanations or additional comments."
 }

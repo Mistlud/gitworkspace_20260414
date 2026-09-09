@@ -218,6 +218,27 @@
   - 이력 목록(`.history-list`)과 상세 이력 패널(`.history-panels`)의 Flex 크기 지정 방식 개선 (`flex: 3`, `flex: 7`로 명시적 비율 분리).
   - 목록과 상세 패널이 영역 밖으로 밀려 스크롤이 무력화되지 않도록 `min-height: 0` 속성을 각각 추가하여 개별 영역 내에서 스크롤바가 정상 활성화되도록 수정.
 
+### Vertex Model Registry & Thinking Level Settings (2026-09-09)
+- Vertex 모델 드롭다운의 하드코딩된 모델 목록을 등록형 목록으로 교체
+  - 설정 탭에서 모델명 추가/삭제 가능, 선택 드롭다운에 즉시 동기화
+  - 기존 설정 파일에 모델 목록이 없을 때 Flash/Pro 기본 목록과 현재 모델로 자동 마이그레이션
+  - 마지막 등록 모델은 삭제하지 못하도록 하며, 선택 모델 삭제 시 남은 첫 모델로 자동 전환
+- Thinking Level을 모델 선택과 분리
+  - `API 기본값 사용 (생략)` / `MINIMAL` / `LOW` / `HIGH` 선택 지원
+  - 생략 선택 시 `thinking_level`과 요청의 `thinking_config`를 모두 생략
+  - 기존 Flash/Pro 선택 시 Thinking Level을 자동 변경하던 동작 제거
+- 온도 입력을 비워 두면 Vertex/OpenAI 호환 요청 모두에서 `temperature`를 생략하는 기존 동작 유지
+
+### Home Tab Guidance Update (2026-09-09)
+- 홈 탭의 앱 설명과 사용 방법을 Vertex AI 및 OpenAI Compatible API의 현재 제공자 흐름에 맞게 개정
+  - Vertex AI는 서비스 계정 JSON 키 등록, OpenAI Compatible은 Endpoint·모델·API Key 프로필 등록 및 활성화 과정을 안내
+  - 번역 모드에서만 도착어를 선택한다는 동작을 명시
+- 홈 탭의 인증 미설정 안내를 선택된 Provider에 따라 동적으로 표시
+  - Vertex AI: JSON 키 등록 안내
+  - OpenAI Compatible: 프로필 추가·활성화 또는 API Key 등록 안내
+- 기타 기능의 설정 설명에 Provider 관리, Vertex 모델 목록, Thinking Level, OpenAI Compatible 프로필, 온도 설정을 반영
+- 사용 방법 단계의 안내 문장을 별도 flex 요소로 구성하고, 앞의 강조 텍스트가 줄바꿈되지 않도록 레이아웃 보완
+
 ---
 
 ## Pending

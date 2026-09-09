@@ -601,6 +601,15 @@ textarea#inputText::-webkit-scrollbar-thumb {
   line-height: 1.65;
 }
 
+.home-step-text {
+  flex: 1;
+  min-width: 0;
+}
+
+.home-step-text strong {
+  white-space: nowrap;
+}
+
 .home-steps li::before {
   content: counter(step);
   min-width: 20px;
@@ -1010,6 +1019,20 @@ textarea#inputText::-webkit-scrollbar-thumb {
   border-color: #7eb8f7;
 }
 
+.thinking-level-select {
+  min-width: 190px;
+}
+
+.thinking-level-field {
+  flex: 0 1 230px;
+}
+
+.settings-hint {
+  margin-top: -4px;
+  color: #667;
+  font-size: 11px;
+}
+
 /* ── API Provider Toggle ── */
 .provider-toggle {
   display: flex;
@@ -1359,6 +1382,117 @@ textarea#inputText::-webkit-scrollbar-thumb {
   background: #3a5a8a;
 }
 
+/* ── Vertex Model Registry ── */
+.model-list-box {
+  border: 1px solid #3a3a60;
+  border-radius: 6px;
+  background: #16162a;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+
+.model-list {
+  display: flex;
+  flex-direction: column;
+  max-height: 180px;
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: #3a3a60 transparent;
+}
+
+.model-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.model-list::-webkit-scrollbar-thumb {
+  background: #3a3a60;
+  border-radius: 2px;
+}
+
+.model-list-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 8px 12px;
+  border-bottom: 1px solid #2a2a45;
+}
+
+.model-list-item:last-child {
+  border-bottom: none;
+}
+
+.model-list-item-name {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: 13px;
+  color: #ccc;
+}
+
+.model-delete-btn {
+  flex: 0 0 auto;
+  padding: 3px 12px;
+  border-radius: 5px;
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+  background: transparent;
+  border: 1px solid #7a2a2a;
+  color: #f08080;
+}
+
+.model-delete-btn:hover:not(:disabled) {
+  background: #3a1a1a;
+  color: #ff9999;
+}
+
+.model-delete-btn.locked {
+  border-color: #3a3a60;
+  color: #555;
+  cursor: default;
+}
+
+.model-add-row {
+  display: flex;
+  gap: 0;
+  border-top: 1px solid #3a3a60;
+}
+
+.model-add-row input {
+  flex: 1;
+  min-width: 0;
+  background: transparent;
+  border: none;
+  color: #ccc;
+  font-size: 13px;
+  font-family: inherit;
+  padding: 8px 12px;
+  outline: none;
+}
+
+.model-add-row input::placeholder {
+  color: #444;
+}
+
+.model-add-row button {
+  padding: 8px 16px;
+  background: #2a4a6a;
+  border: none;
+  border-left: 1px solid #3a3a60;
+  color: #7eb8f7;
+  font-size: 13px;
+  font-weight: 600;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+.model-add-row button:hover {
+  background: #3a5a8a;
+}
+
 /* ── Flip Button ── */
 .flip-btn {
   position: absolute;
@@ -1633,4 +1767,3 @@ textarea#inputText::-webkit-scrollbar-thumb {
   color: #444;
   font-size: 15px;
 }
-

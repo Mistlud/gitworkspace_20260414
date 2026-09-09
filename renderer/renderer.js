@@ -6,9 +6,11 @@ const history = [];
 let lastDeleted = null;
 
 const LOCKED_LANGS = ['Korean', 'English'];
+const DEFAULT_VERTEX_MODELS = ['gemini-3-flash-preview', 'gemini-3.1-pro-preview'];
 
 window.addEventListener('DOMContentLoaded', async () => {
   prompts = await window.api.getPrompts();
+  if (ensureVertexModels()) await window.api.savePrompts(prompts);
 
   // ── App config + 프로파일 로드
   appConfig = await window.api.loadAppConfig();
@@ -201,17 +203,35 @@ window.addEventListener('DOMContentLoaded', async () => {
     setTimeout(() => { feedback.style.display = 'none'; }, 2500);
   });
 
-  // Model selection
+  // Vertex model selection and registry
   const modelSelect = document.getElementById('modelSelect');
-  modelSelect.value = prompts.model || 'gemini-3-flash-preview';
+  renderVertexModelList();
+  syncVertexModelSelect();
   modelSelect.addEventListener('change', async () => {
-    const selected = modelSelect.value;
-    prompts.model = selected;
-    if (selected === 'gemini-3-flash-preview') {
-      prompts.thinking_level = 'MINIMAL';
-    } else {
-      delete prompts.thinking_level;
+    prompts.model = modelSelect.value;
+    await window.api.savePrompts(prompts);
+  });
+
+  document.getElementById('vertexModelAddBtn').addEventListener('click', () => {
+    const input = document.getElementById('vertexModelInput');
+    addVertexModel(input.value);
+    input.value = '';
+  });
+  document.getElementById('vertexModelInput').addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+      const input = document.getElementById('vertexModelInput');
+      addVertexModel(input.value);
+      input.value = '';
     }
+  });
+
+  // Thinking Level (Vertex AI only)
+  const thinkingLevelSelect = document.getElementById('thinkingLevelSelect');
+  thinkingLevelSelect.value = prompts.thinking_level || '';
+  thinkingLevelSelect.addEventListener('change', async () => {
+    const level = thinkingLevelSelect.value;
+    if (level) prompts.thinking_level = level;
+    else delete prompts.thinking_level;
     await window.api.savePrompts(prompts);
   });
 
@@ -359,7 +379,7 @@ function updateIndicator() {
   const homeIndicator = document.getElementById('homeKeyIndicator');
   const homeKeyHint   = document.getElementById('homeKeyHint');
 
-  let text, cls, showHint;
+  let text, cls, showHint, hintHtml = '';
 
   if (provider === 'vertex') {
     if (hasSavedKey) {
@@ -370,6 +390,7 @@ function updateIndicator() {
       text = '⚠ Vertex AI 키 미설정';
       cls  = 'key-indicator missing';
       showHint = true;
+      hintHtml = '설정(⚙) 탭에서 Vertex AI 서비스 계정 JSON 키를 등록해주세요.<br>키가 없으면 번역·교정 기능을 사용할 수 없습니다.';
     }
   } else {
     const activeId  = appConfig.activeProfileId;
@@ -382,10 +403,12 @@ function updateIndicator() {
       text = `⚠ ${profile.name} (키 없음)`;
       cls  = 'key-indicator missing';
       showHint = true;
+      hintHtml = '설정(⚙) 탭에서 활성 OpenAI Compatible 프로필에 API Key를 등록해주세요.<br>키가 없으면 번역·교정 기능을 사용할 수 없습니다.';
     } else {
       text = '⚠ 프로파일 미선택';
       cls  = 'key-indicator missing';
       showHint = true;
+      hintHtml = '설정(⚙) 탭에서 OpenAI Compatible 프로필을 추가하고 활성화해주세요.<br>프로필이 없으면 번역·교정 기능을 사용할 수 없습니다.';
     }
   }
 
@@ -393,6 +416,7 @@ function updateIndicator() {
   indicator.className   = cls;
   homeIndicator.textContent = text;
   homeIndicator.className   = cls;
+  homeKeyHint.innerHTML = hintHtml;
   homeKeyHint.style.display = showHint ? '' : 'none';
 }
 
@@ -712,6 +736,105 @@ function showPromptFeedback(id) {
   el.className = 'key-feedback ok';
   el.style.display = '';
   setTimeout(() => { el.style.display = 'none'; }, 2500);
+}
+
+function ensureVertexModels() {
+  const hasStoredModelList = Array.isArray(prompts.vertexModels);
+  const existingModels = hasStoredModelList ? prompts.vertexModels : [];
+  const currentModel = typeof prompts.model === 'string' && prompts.model.trim()
+    ? prompts.model.trim()
+    : DEFAULT_VERTEX_MODELS[0];
+  const modelCandidates = hasStoredModelList && existingModels.length
+    ? [...existingModels, currentModel]
+    : [...DEFAULT_VERTEX_MODELS, currentModel];
+  const normalizedModels = modelCandidates
+    .map((model) => typeof model === 'string' ? model.trim() : '')
+    .filter(Boolean)
+    .filter((model, index, models) => models.indexOf(model) === index);
+  const changed = prompts.model !== currentModel
+    || JSON.stringify(existingModels) !== JSON.stringify(normalizedModels);
+
+  prompts.model = currentModel;
+  prompts.vertexModels = normalizedModels.length ? normalizedModels : [...DEFAULT_VERTEX_MODELS];
+  return changed;
+}
+
+function renderVertexModelList() {
+  const list = document.getElementById('vertexModelList');
+  list.innerHTML = '';
+
+  prompts.vertexModels.forEach((model) => {
+    const item = document.createElement('div');
+    item.className = 'model-list-item';
+
+    const name = document.createElement('span');
+    name.className = 'model-list-item-name';
+    name.textContent = model;
+
+    const del = document.createElement('button');
+    del.className = 'model-delete-btn';
+    if (prompts.vertexModels.length === 1) {
+      del.textContent = '필수';
+      del.disabled = true;
+      del.classList.add('locked');
+    } else {
+      del.textContent = '삭제';
+      del.addEventListener('click', () => deleteVertexModel(model));
+    }
+
+    item.appendChild(name);
+    item.appendChild(del);
+    list.appendChild(item);
+  });
+}
+
+function syncVertexModelSelect() {
+  const select = document.getElementById('modelSelect');
+  const models = prompts.vertexModels || [];
+  select.innerHTML = '';
+  models.forEach((model) => {
+    const option = document.createElement('option');
+    option.value = model;
+    option.textContent = model;
+    select.appendChild(option);
+  });
+
+  if (!models.includes(prompts.model)) prompts.model = models[0];
+  select.value = prompts.model;
+}
+
+function showVertexModelFeedback(message, type) {
+  const el = document.getElementById('vertexModelFeedback');
+  el.textContent = message;
+  el.className = `key-feedback ${type}`;
+  el.style.display = '';
+  setTimeout(() => { el.style.display = 'none'; }, 2500);
+}
+
+async function addVertexModel(rawName) {
+  const model = rawName.trim();
+  if (!model) return;
+  if (prompts.vertexModels.includes(model)) {
+    return showVertexModelFeedback(`✗ "${model}"은(는) 이미 목록에 있습니다.`, 'error');
+  }
+  prompts.vertexModels.push(model);
+  await saveAndSyncVertexModels();
+  showVertexModelFeedback(`✓ "${model}" 추가됨`, 'ok');
+}
+
+async function deleteVertexModel(model) {
+  if (prompts.vertexModels.length <= 1) {
+    return showVertexModelFeedback('✗ 모델 목록에는 하나 이상의 모델이 필요합니다.', 'error');
+  }
+  prompts.vertexModels = prompts.vertexModels.filter((item) => item !== model);
+  if (prompts.model === model) prompts.model = prompts.vertexModels[0];
+  await saveAndSyncVertexModels();
+}
+
+async function saveAndSyncVertexModels() {
+  await window.api.savePrompts(prompts);
+  renderVertexModelList();
+  syncVertexModelSelect();
 }
 
 function renderLangList() {
