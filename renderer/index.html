@@ -26,7 +26,7 @@
         </button>
         <button class="tab-btn" data-tab="tab4">
           <span class="tab-icon">◇</span>
-          <span class="tab-label">기타</span>
+          <span class="tab-label">비교</span>
         </button>
         <button class="tab-btn" data-tab="settings">
           <span class="tab-icon">⚙</span>
@@ -84,6 +84,7 @@
               <div class="home-section-title">기타 기능</div>
               <div class="home-misc-list">
                 <div class="home-misc-item"><span class="home-misc-key">이력</span>번역·교정 결과를 최대 10건 자동 저장합니다. 항목을 클릭하면 입력과 결과를 함께 볼 수 있으며, 삭제한 항목은 즉시 되돌릴 수 있습니다. 앱 종료 시 초기화됩니다.</div>
+                <div class="home-misc-item"><span class="home-misc-key">비교</span>두 텍스트를 좌우에 입력한 뒤 비교하면 공통 부분과 차이점을 색으로 표시합니다. 각 원문의 글자 수·예상 토큰 수를 확인할 수 있으며, 공백·대소문자·줄바꿈 무시 옵션, 좌우 교체, 원문 복사, 이전/다음 차이 탐색을 제공합니다. 비교 내용은 외부 API로 전송하거나 저장하지 않습니다.</div>
                 <div class="home-misc-item"><span class="home-misc-key">설정</span>API Provider와 인증 정보를 관리합니다. Vertex AI에서는 JSON 키, 등록 모델 목록, Thinking Level, 최대 출력 토큰을 설정할 수 있고, OpenAI Compatible에서는 Endpoint·모델·API Key별 프로필을 관리합니다. 온도, 언어 목록, 번역·교정 프롬프트도 변경할 수 있습니다.</div>
                 <div class="home-misc-item"><span class="home-misc-key">📌</span>사이드바 하단 버튼. 클릭하면 창을 항상 위에 고정합니다. 활성 시 파란색으로 표시됩니다.</div>
                 <div class="home-misc-item"><span class="home-misc-key">🔆</span>사이드바 하단 버튼. 클릭하면 창 배경 투명도 슬라이더가 나타납니다. 20~100% 범위에서 조절할 수 있습니다.</div>
@@ -126,10 +127,62 @@
         </div>
       </div>
 
-      <!-- Tab 4: TBD -->
+      <!-- Tab 4: Text comparison -->
       <div class="tab-panel" id="tab-tab4">
-        <div class="placeholder">
-          <span>준비 중</span>
+        <div class="compare-toolbar">
+          <div class="compare-title">텍스트 비교</div>
+          <div class="compare-toolbar-actions">
+            <button class="compare-button secondary" id="compareSwapBtn" type="button">좌우 교체</button>
+            <button class="compare-button secondary" id="compareResetBtn" type="button">초기화</button>
+            <button class="compare-button primary" id="compareRunBtn" type="button">비교</button>
+          </div>
+        </div>
+        <div class="compare-options" aria-label="비교 옵션">
+          <label class="compare-toggle">
+            <input type="checkbox" id="compareIgnoreWhitespace">
+            <span class="compare-toggle-track" aria-hidden="true"></span>
+            <span>공백 무시</span>
+          </label>
+          <label class="compare-toggle">
+            <input type="checkbox" id="compareIgnoreCase">
+            <span class="compare-toggle-track" aria-hidden="true"></span>
+            <span>대소문자 무시</span>
+          </label>
+          <label class="compare-toggle">
+            <input type="checkbox" id="compareIgnoreNewlines">
+            <span class="compare-toggle-track" aria-hidden="true"></span>
+            <span>줄바꿈 무시</span>
+          </label>
+        </div>
+        <div class="compare-inputs">
+          <section class="compare-source-panel">
+            <div class="compare-panel-heading"><label for="compareLeftInput">왼쪽 원문</label><button class="compare-copy-btn" id="compareLeftCopyBtn" type="button">원문 복사</button></div>
+            <textarea id="compareLeftInput" placeholder="비교할 왼쪽 텍스트를 입력하세요..."></textarea>
+            <div class="compare-metrics" id="compareLeftMetrics">0자 · 예상 0토큰</div>
+          </section>
+          <section class="compare-source-panel">
+            <div class="compare-panel-heading"><label for="compareRightInput">오른쪽 원문</label><button class="compare-copy-btn" id="compareRightCopyBtn" type="button">원문 복사</button></div>
+            <textarea id="compareRightInput" placeholder="비교할 오른쪽 텍스트를 입력하세요..."></textarea>
+            <div class="compare-metrics" id="compareRightMetrics">0자 · 예상 0토큰</div>
+          </section>
+        </div>
+        <div class="compare-status-row">
+          <span class="compare-status" id="compareStatus" aria-live="polite">양쪽에 텍스트를 입력한 뒤 비교하세요.</span>
+          <div class="compare-navigation">
+            <button class="compare-button secondary" id="comparePrevBtn" type="button" disabled>이전 차이</button>
+            <span id="comparePosition">0 / 0</span>
+            <button class="compare-button secondary" id="compareNextBtn" type="button" disabled>다음 차이</button>
+          </div>
+        </div>
+        <div class="compare-results">
+          <section class="compare-result-panel">
+            <div class="compare-result-heading">왼쪽 비교 결과</div>
+            <div class="compare-result-text" id="compareLeftResult">비교 결과가 여기에 표시됩니다.</div>
+          </section>
+          <section class="compare-result-panel">
+            <div class="compare-result-heading">오른쪽 비교 결과</div>
+            <div class="compare-result-text" id="compareRightResult">비교 결과가 여기에 표시됩니다.</div>
+          </section>
         </div>
       </div>
 

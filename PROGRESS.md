@@ -218,6 +218,16 @@
   - 이력 목록(`.history-list`)과 상세 이력 패널(`.history-panels`)의 Flex 크기 지정 방식 개선 (`flex: 3`, `flex: 7`로 명시적 비율 분리).
   - 목록과 상세 패널이 영역 밖으로 밀려 스크롤이 무력화되지 않도록 `min-height: 0` 속성을 각각 추가하여 개별 영역 내에서 스크롤바가 정상 활성화되도록 수정.
 
+### Text Comparison Tab (2026-09-10)
+- Replaced the `기타` placeholder with the `비교` tab: a local, side-by-side text comparison workspace.
+- Added exact character counts and clearly labelled estimated token counts for each source input, plus character/token deltas in the result status.
+- Added safe left/right diff highlighting, source-specific copy controls, input swapping, reset, and previous/next difference navigation.
+- Added whitespace/case/newline comparison options as accessible toggle switches; these change only equivalence testing and preserve the visible source text.
+- Added a home-tab guide covering comparison behaviour, controls, and local-only data handling.
+- No LLM API request, key storage, or comparison-content persistence is used.
+- Each source input is limited to 20,000 characters to keep the renderer responsive.
+- Manual UI testing completed: identical, partially different, fully different, option-toggle, copy, swap, navigation, shortcut, and existing-tab regression cases passed.
+
 ### Vertex Model Registry & Thinking Level Settings (2026-09-09)
 - Vertex 모델 드롭다운의 하드코딩된 모델 목록을 등록형 목록으로 교체
   - 설정 탭에서 모델명 추가/삭제 가능, 선택 드롭다운에 즉시 동기화

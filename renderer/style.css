@@ -1758,12 +1758,318 @@ textarea#inputText::-webkit-scrollbar-thumb {
   color: #f08080;
 }
 
-/* ── Tab 4: Placeholder ── */
-.placeholder {
-  flex: 1;
+/* ── Tab 4: Text comparison ── */
+#tab-tab4 {
+  min-height: 0;
+  background: rgba(30, 30, 46, var(--bg-alpha));
+}
+
+.compare-toolbar,
+.compare-status-row {
   display: flex;
   align-items: center;
-  justify-content: center;
-  color: #444;
-  font-size: 15px;
+  gap: 12px;
+  padding: 10px 16px;
+  background: rgba(22, 22, 42, var(--bg-alpha));
+  border-bottom: 1px solid #2a2a45;
+  flex-shrink: 0;
+}
+
+.compare-title {
+  font-size: 14px;
+  font-weight: 700;
+  color: #c8d8f0;
+  flex: 1;
+}
+
+.compare-toolbar-actions,
+.compare-navigation {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.compare-button,
+.compare-copy-btn {
+  border-radius: 6px;
+  font-family: inherit;
+  font-size: 12px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.compare-button {
+  padding: 6px 12px;
+  border: 1px solid #3a3a60;
+}
+
+.compare-button.primary {
+  background: #4a90e2;
+  border-color: #4a90e2;
+  color: #fff;
+  font-weight: 600;
+}
+
+.compare-button.primary:hover {
+  background: #357abd;
+  border-color: #357abd;
+}
+
+.compare-button.secondary,
+.compare-copy-btn {
+  background: #2a2a45;
+  color: #b8c2d8;
+}
+
+.compare-button.secondary:hover:not(:disabled),
+.compare-copy-btn:hover {
+  background: #3a3a60;
+  border-color: #5a5a80;
+  color: #fff;
+}
+
+.compare-button:disabled {
+  color: #62627a;
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
+.compare-options {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 8px 16px;
+  border-bottom: 1px solid #2a2a45;
+  color: #9aa5ba;
+  font-size: 12px;
+  flex-shrink: 0;
+}
+
+.compare-toggle {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.compare-toggle input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.compare-toggle-track {
+  position: relative;
+  width: 30px;
+  height: 17px;
+  flex-shrink: 0;
+  border: 1px solid #4a4a6c;
+  border-radius: 999px;
+  background: #292940;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.compare-toggle-track::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: #9aa5ba;
+  transition: transform 0.15s, background 0.15s;
+}
+
+.compare-toggle input:checked + .compare-toggle-track {
+  background: #2e5f98;
+  border-color: #5fabe9;
+}
+
+.compare-toggle input:checked + .compare-toggle-track::after {
+  transform: translateX(13px);
+  background: #fff;
+}
+
+.compare-toggle:hover .compare-toggle-track {
+  border-color: #6b7a9c;
+}
+
+.compare-toggle input:focus-visible + .compare-toggle-track {
+  outline: 2px solid #7eb8f7;
+  outline-offset: 2px;
+}
+
+.compare-inputs,
+.compare-results {
+  display: flex;
+  min-height: 0;
+  gap: 1px;
+  background: rgba(42, 42, 69, var(--bg-alpha));
+}
+
+.compare-inputs {
+  flex: 0 0 31%;
+  min-height: 170px;
+}
+
+.compare-source-panel,
+.compare-result-panel {
+  display: flex;
+  flex: 1;
+  min-width: 0;
+  flex-direction: column;
+  background: rgba(30, 30, 46, var(--bg-alpha));
+}
+
+.compare-panel-heading,
+.compare-result-heading {
+  display: flex;
+  align-items: center;
+  min-height: 36px;
+  padding: 7px 12px;
+  border-bottom: 1px solid #2a2a45;
+  color: #9aa5ba;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.compare-panel-heading label {
+  flex: 1;
+}
+
+.compare-copy-btn {
+  border: 1px solid #3a3a60;
+  padding: 4px 9px;
+  white-space: nowrap;
+}
+
+.compare-source-panel textarea {
+  flex: 1;
+  width: 100%;
+  min-height: 0;
+  padding: 12px;
+  resize: none;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: #e0e0e0;
+  font: 14px/1.65 'Segoe UI', sans-serif;
+  scrollbar-width: thin;
+  scrollbar-color: #3a3a60 transparent;
+}
+
+.compare-source-panel textarea:focus {
+  box-shadow: inset 0 0 0 1px #4a90e2;
+}
+
+.compare-metrics {
+  padding: 7px 12px;
+  color: #71809b;
+  border-top: 1px solid #2a2a45;
+  font-size: 11px;
+  flex-shrink: 0;
+}
+
+.compare-status-row {
+  min-height: 44px;
+  padding-top: 7px;
+  padding-bottom: 7px;
+}
+
+.compare-status {
+  flex: 1;
+  min-width: 0;
+  color: #aebbd0;
+  font-size: 12px;
+}
+
+.compare-navigation {
+  color: #8290aa;
+  font-size: 11px;
+  white-space: nowrap;
+}
+
+.compare-results {
+  flex: 1;
+  overflow: hidden;
+}
+
+.compare-result-text {
+  flex: 1;
+  min-height: 0;
+  overflow: auto;
+  padding: 12px;
+  color: #c8d8f0;
+  font: 14px/1.65 'Segoe UI', sans-serif;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  scrollbar-width: thin;
+  scrollbar-color: #3a3a60 transparent;
+}
+
+.compare-diff-left,
+.compare-diff-right {
+  border-radius: 3px;
+  color: inherit;
+  transition: outline-color 0.15s;
+}
+
+.compare-diff-left {
+  background: #632f43;
+  box-shadow: inset 0 -1px 0 #e882a5;
+}
+
+.compare-diff-right {
+  background: #1f554b;
+  box-shadow: inset 0 -1px 0 #76d9bb;
+}
+
+.compare-diff-anchor {
+  display: inline-block;
+  min-width: 3px;
+  min-height: 1.25em;
+  vertical-align: text-bottom;
+}
+
+.compare-diff-left.active,
+.compare-diff-right.active {
+  outline: 2px solid #f2d477;
+  outline-offset: 1px;
+}
+
+@media (max-width: 720px) {
+  .compare-toolbar,
+  .compare-status-row {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .compare-toolbar-actions,
+  .compare-navigation {
+    flex-wrap: wrap;
+  }
+
+  .compare-options {
+    flex-wrap: wrap;
+    gap: 8px 14px;
+  }
+
+  .compare-inputs,
+  .compare-results {
+    flex-direction: column;
+    overflow: auto;
+  }
+
+  .compare-inputs {
+    flex-basis: 45%;
+  }
+
+  .compare-source-panel,
+  .compare-result-panel {
+    min-height: 150px;
+  }
 }

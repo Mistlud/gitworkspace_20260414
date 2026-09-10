@@ -50,6 +50,8 @@ window.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
+  setupComparisonTab();
+
   // Pin (always on top)
   let isAlwaysOnTop = false;
   const pinBtn = document.getElementById('pinBtn');
@@ -296,6 +298,12 @@ window.addEventListener('DOMContentLoaded', async () => {
     if (e.ctrlKey && e.key === 'Enter') {
       const translateTab = document.getElementById('tab-translate');
       if (translateTab.classList.contains('active')) showSubmitConfirmModal();
+      const comparisonTab = document.getElementById('tab-tab4');
+      if (comparisonTab.classList.contains('active') &&
+          (e.target.id === 'compareLeftInput' || e.target.id === 'compareRightInput')) {
+        e.preventDefault();
+        runComparison();
+      }
     }
   });
 
@@ -360,6 +368,270 @@ function applyOpacity(value) {
   const pct = Math.round(value * 100);
   document.getElementById('opacitySlider').value = pct;
   document.getElementById('opacityValue').textContent = `${pct}%`;
+}
+
+// ─── 텍스트 비교 탭 ─────────────────────────────────────────────────────────
+const COMPARE_MAX_CHARS = 20000;
+let comparisonDiffs = [];
+let comparisonPosition = -1;
+
+function setupComparisonTab() {
+  const leftInput = document.getElementById('compareLeftInput');
+  const rightInput = document.getElementById('compareRightInput');
+
+  [leftInput, rightInput].forEach((input) => {
+    input.addEventListener('input', updateComparisonMetrics);
+  });
+
+  document.getElementById('compareRunBtn').addEventListener('click', runComparison);
+  document.getElementById('compareResetBtn').addEventListener('click', resetComparison);
+  document.getElementById('compareSwapBtn').addEventListener('click', () => {
+    const previousLeft = leftInput.value;
+    leftInput.value = rightInput.value;
+    rightInput.value = previousLeft;
+    updateComparisonMetrics();
+    runComparison();
+  });
+  document.getElementById('compareLeftCopyBtn').addEventListener('click', () => copyComparisonSource(leftInput, 'compareLeftCopyBtn'));
+  document.getElementById('compareRightCopyBtn').addEventListener('click', () => copyComparisonSource(rightInput, 'compareRightCopyBtn'));
+  document.getElementById('comparePrevBtn').addEventListener('click', () => moveComparisonDifference(-1));
+  document.getElementById('compareNextBtn').addEventListener('click', () => moveComparisonDifference(1));
+  document.querySelectorAll('.compare-options input').forEach((option) => option.addEventListener('change', () => {
+    if (leftInput.value && rightInput.value) runComparison();
+  }));
+  updateComparisonMetrics();
+}
+
+function updateComparisonMetrics() {
+  const left = document.getElementById('compareLeftInput').value;
+  const right = document.getElementById('compareRightInput').value;
+  document.getElementById('compareLeftMetrics').textContent = formatComparisonMetrics(left);
+  document.getElementById('compareRightMetrics').textContent = formatComparisonMetrics(right);
+}
+
+function formatComparisonMetrics(text) {
+  return `${text.length.toLocaleString('ko-KR')}자 · 예상 ${estimateTokens(text).toLocaleString('ko-KR')}토큰`;
+}
+
+function estimateTokens(text) {
+  let cjk = 0;
+  let latinOrNumber = 0;
+  let whitespace = 0;
+  let symbols = 0;
+  for (const char of text) {
+    if (/\p{Script=Hangul}|\p{Script=Hiragana}|\p{Script=Katakana}|\p{Script=Han}/u.test(char)) cjk++;
+    else if (/[A-Za-z0-9]/.test(char)) latinOrNumber++;
+    else if (/\s/u.test(char)) whitespace++;
+    else symbols++;
+  }
+  return Math.ceil((cjk * 1.3) + (latinOrNumber / 4) + (whitespace * 0.1) + symbols);
+}
+
+function getComparisonOptions() {
+  return {
+    ignoreWhitespace: document.getElementById('compareIgnoreWhitespace').checked,
+    ignoreCase: document.getElementById('compareIgnoreCase').checked,
+    ignoreNewlines: document.getElementById('compareIgnoreNewlines').checked,
+  };
+}
+
+function comparisonTokenize(text) {
+  if (typeof Intl.Segmenter === 'function') {
+    const segmenter = new Intl.Segmenter('ko', { granularity: 'word' });
+    return Array.from(segmenter.segment(text), ({ segment }) => segment);
+  }
+  return Array.from(text);
+}
+
+function comparisonKey(token, options) {
+  if (options.ignoreNewlines && /^(\r\n|\r|\n)$/.test(token)) return '__IGNORED_NEWLINE__';
+  if (options.ignoreWhitespace && /^\s+$/.test(token)) return '__IGNORED_WHITESPACE__';
+  return options.ignoreCase ? token.toLocaleLowerCase() : token;
+}
+
+function runComparison() {
+  const left = document.getElementById('compareLeftInput').value;
+  const right = document.getElementById('compareRightInput').value;
+  const status = document.getElementById('compareStatus');
+
+  if (!left || !right) {
+    clearComparisonResults('양쪽에 텍스트를 모두 입력해주세요.');
+    return;
+  }
+  if (left.length > COMPARE_MAX_CHARS || right.length > COMPARE_MAX_CHARS) {
+    clearComparisonResults(`각 텍스트는 ${COMPARE_MAX_CHARS.toLocaleString('ko-KR')}자 이하로 입력해주세요.`);
+    return;
+  }
+
+  const options = getComparisonOptions();
+  const leftTokens = comparisonTokenize(left);
+  const rightTokens = comparisonTokenize(right);
+  const changes = myersDiff(leftTokens, rightTokens, (a, b) => comparisonKey(a, options) === comparisonKey(b, options));
+  renderComparisonResults(changes);
+
+  const differenceCount = comparisonDiffs.length;
+  const optionNames = [];
+  if (options.ignoreWhitespace) optionNames.push('공백 무시');
+  if (options.ignoreCase) optionNames.push('대소문자 무시');
+  if (options.ignoreNewlines) optionNames.push('줄바꿈 무시');
+  const optionNote = optionNames.length ? ` · ${optionNames.join(', ')}` : '';
+  const delta = left.length - right.length;
+  const tokenDelta = estimateTokens(left) - estimateTokens(right);
+  const deltaNote = `글자 수 차이 ${formatSignedNumber(delta)}자 · 예상 토큰 차이 ${formatSignedNumber(tokenDelta)}토큰`;
+  status.textContent = differenceCount === 0
+    ? `두 텍스트가 동일합니다. · ${deltaNote}${optionNote}`
+    : `차이 ${differenceCount}곳 · ${deltaNote}${optionNote}`;
+  setComparisonPosition(differenceCount ? 0 : -1);
+}
+
+function myersDiff(left, right, equals) {
+  const leftLength = left.length;
+  const rightLength = right.length;
+  const max = leftLength + rightLength;
+  const trace = [];
+  let frontier = new Map([[1, 0]]);
+
+  for (let distance = 0; distance <= max; distance++) {
+    trace.push(new Map(frontier));
+    for (let diagonal = -distance; diagonal <= distance; diagonal += 2) {
+      const goDown = diagonal === -distance || (diagonal !== distance && (frontier.get(diagonal - 1) ?? -1) < (frontier.get(diagonal + 1) ?? -1));
+      let x = goDown ? (frontier.get(diagonal + 1) ?? 0) : (frontier.get(diagonal - 1) ?? 0) + 1;
+      let y = x - diagonal;
+      while (x < leftLength && y < rightLength && equals(left[x], right[y])) {
+        x++;
+        y++;
+      }
+      frontier.set(diagonal, x);
+      if (x >= leftLength && y >= rightLength) return buildMyersChanges(trace, left, right);
+    }
+  }
+  return [];
+}
+
+function buildMyersChanges(trace, left, right) {
+  let x = left.length;
+  let y = right.length;
+  const changes = [];
+  for (let distance = trace.length - 1; distance >= 0; distance--) {
+    const frontier = trace[distance];
+    const diagonal = x - y;
+    const goDown = diagonal === -distance || (diagonal !== distance && (frontier.get(diagonal - 1) ?? -1) < (frontier.get(diagonal + 1) ?? -1));
+    const previousDiagonal = goDown ? diagonal + 1 : diagonal - 1;
+    const previousX = frontier.get(previousDiagonal) ?? 0;
+    const previousY = previousX - previousDiagonal;
+    while (x > previousX && y > previousY) {
+      changes.push({ type: 'equal', left: left[x - 1], right: right[y - 1] });
+      x--; y--;
+    }
+    if (distance === 0) break;
+    if (x === previousX) {
+      changes.push({ type: 'added', value: right[y - 1] });
+      y--;
+    } else {
+      changes.push({ type: 'removed', value: left[x - 1] });
+      x--;
+    }
+  }
+  return changes.reverse();
+}
+
+function renderComparisonResults(changes) {
+  const leftResult = document.getElementById('compareLeftResult');
+  const rightResult = document.getElementById('compareRightResult');
+  leftResult.replaceChildren();
+  rightResult.replaceChildren();
+  comparisonDiffs = [];
+  comparisonPosition = -1;
+
+  let index = 0;
+  while (index < changes.length) {
+    const change = changes[index];
+    if (change.type === 'equal') {
+      appendComparisonText(leftResult, change.left);
+      appendComparisonText(rightResult, change.right);
+      index++;
+      continue;
+    }
+
+    const group = [];
+    while (index < changes.length && changes[index].type !== 'equal') group.push(changes[index++]);
+    const diffIndex = comparisonDiffs.length;
+    const leftMark = createComparisonMark('compare-diff-left', diffIndex);
+    const rightMark = createComparisonMark('compare-diff-right', diffIndex);
+    group.filter((item) => item.type === 'removed').forEach((item) => appendComparisonText(leftMark, item.value));
+    group.filter((item) => item.type === 'added').forEach((item) => appendComparisonText(rightMark, item.value));
+    if (!leftMark.textContent) leftMark.classList.add('compare-diff-anchor');
+    if (!rightMark.textContent) rightMark.classList.add('compare-diff-anchor');
+    leftResult.appendChild(leftMark);
+    rightResult.appendChild(rightMark);
+    comparisonDiffs.push({ leftMark, rightMark });
+  }
+}
+
+function createComparisonMark(className, index) {
+  const mark = document.createElement('mark');
+  mark.className = className;
+  mark.dataset.diffIndex = index;
+  return mark;
+}
+
+function appendComparisonText(parent, text) {
+  parent.appendChild(document.createTextNode(text));
+}
+
+function setComparisonPosition(position) {
+  comparisonPosition = position;
+  const total = comparisonDiffs.length;
+  document.getElementById('comparePosition').textContent = total ? `${position + 1} / ${total}` : '0 / 0';
+  document.getElementById('comparePrevBtn').disabled = total === 0;
+  document.getElementById('compareNextBtn').disabled = total === 0;
+  comparisonDiffs.forEach((diff, index) => {
+    diff.leftMark.classList.toggle('active', index === position);
+    diff.rightMark.classList.toggle('active', index === position);
+  });
+  if (position >= 0) {
+    const selected = comparisonDiffs[position];
+    selected.leftMark.scrollIntoView({ block: 'center' });
+    selected.rightMark.scrollIntoView({ block: 'center' });
+  }
+}
+
+function moveComparisonDifference(direction) {
+  if (!comparisonDiffs.length) return;
+  setComparisonPosition((comparisonPosition + direction + comparisonDiffs.length) % comparisonDiffs.length);
+}
+
+function clearComparisonResults(message) {
+  comparisonDiffs = [];
+  comparisonPosition = -1;
+  document.getElementById('compareLeftResult').textContent = '비교 결과가 여기에 표시됩니다.';
+  document.getElementById('compareRightResult').textContent = '비교 결과가 여기에 표시됩니다.';
+  document.getElementById('compareStatus').textContent = message;
+  setComparisonPosition(-1);
+}
+
+function resetComparison() {
+  document.getElementById('compareLeftInput').value = '';
+  document.getElementById('compareRightInput').value = '';
+  document.querySelectorAll('.compare-options input').forEach((option) => { option.checked = false; });
+  updateComparisonMetrics();
+  clearComparisonResults('양쪽에 텍스트를 입력한 뒤 비교하세요.');
+}
+
+async function copyComparisonSource(input, buttonId) {
+  const button = document.getElementById(buttonId);
+  if (!input.value) return;
+  try {
+    await navigator.clipboard.writeText(input.value);
+    button.textContent = '복사됨';
+  } catch {
+    button.textContent = '복사 실패';
+  }
+  setTimeout(() => { button.textContent = '원문 복사'; }, 1500);
+}
+
+function formatSignedNumber(value) {
+  return `${value > 0 ? '+' : ''}${value.toLocaleString('ko-KR')}`;
 }
 
 

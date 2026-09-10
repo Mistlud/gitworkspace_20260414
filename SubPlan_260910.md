@@ -94,7 +94,7 @@ Escape all text before inserting it into HTML. Prefer creating text nodes and `<
 
 ### Scale and failure behavior
 
-- Define and display a practical size limit before comparing (recommended initial limit: 100,000 characters per side). This prevents a pasted document from freezing the renderer.
+- Define and display a practical size limit before comparing (initial limit: 20,000 characters per side). This prevents a pasted document from freezing the renderer while using the in-renderer diff algorithm.
 - For an empty side, show a local validation message and leave prior result hidden.
 - For identical non-empty text, show the text in both result panes and the status `두 텍스트가 동일합니다.`
 - Keep all comparison state in renderer memory in the first release. Do not persist potentially sensitive pasted content to `app-config.json` or disk.
