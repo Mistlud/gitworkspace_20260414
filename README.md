@@ -15,7 +15,7 @@ Google Vertex AI(Gemini) 및 OpenAI 호환 API(OpenAI, OpenRouter, Ollama 등)�
 
 ## 다운로드
 
-[최신 버전 릴리즈](https://github.com/Mistlud/gitworkspace_20260414/releases/latest)에서 `LLMTransTool-*-win.zip`을 받아 압축 해제 후 실행하세요.
+[최신 버전 릴리즈](https://github.com/Mistlud/gitworkspace_20260414/releases/latest)에서 `LLMTransTool-*-win.zip`을 받아 압축 해제 후 실행하세요. 현재 릴리즈 버전은 `v0.9.4`입니다.
 
 ## 개발 환경 실행
 
