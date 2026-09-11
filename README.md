@@ -1,8 +1,23 @@
 # LLM Translation & Grammar Correction
 
+## 다운로드
+
+[최신 버전 릴리즈](https://github.com/Mistlud/gitworkspace_20260414/releases/latest)에서 `LLMTransTool-*-win.zip`을 받아 압축 해제 후 실행하세요. 현재 릴리즈 버전은 `v0.9.5`입니다.
+
+## 앱 소개
+
+Google Vertex AI(Gemini) 및 OpenAI 호환 API(OpenAI, OpenRouter, Ollama 등)를 활용한 번역 및 문법 교정 데스크톱 앱.
+
+## 주요 기능
+
+- 번역·교정: 번역 모드의 도착 언어 선택과 교정 모드의 자동 언어 감지를 지원합니다.
+- 이력: 최근 번역·교정 기록을 확인하고, 원문·모드·도착 언어를 복원해 다시 편집할 수 있습니다.
+- 비교: 두 텍스트 또는 번역·교정 결과를 로컬에서 나란히 비교하고 차이를 탐색할 수 있습니다.
+- Provider 설정: Vertex AI와 OpenAI 호환 API 프로필을 선택해 사용할 수 있습니다.
+
 ## 텍스트 비교
 
-`비교` 탭에서 두 원문을 좌우에 입력한 뒤 차이점과 공통 부분을 확인할 수 있습니다. 이 기능은 로컬에서만 동작하며, 비교 텍스트를 LLM API로 전송하거나 디스크에 저장하지 않습니다.
+`비교` 탭에서 두 원문을 좌우에 입력한 뒤 차이점과 공통 부분을 확인할 수 있습니다. 번역·교정 결과의 `비교` 버튼을 누르면 원문과 결과를 자동으로 채워 즉시 비교할 수도 있습니다. 비교 텍스트는 LLM API로 전송하거나 디스크에 저장하지 않습니다.
 
 - 왼쪽 전용 차이와 오른쪽 전용 차이를 각각 색으로 표시
 - 각 원문의 정확한 글자 수와 `예상 토큰` 수, 비교 후 글자·토큰 차이 표시
@@ -10,12 +25,6 @@
 - 좌우 원문 교체, 각 원문 개별 복사, 초기화
 - 이전/다음 차이 탐색 및 `Ctrl+Enter` 비교 단축키
 - 성능 보호를 위해 원문당 최대 20,000자 입력 지원
-
-Google Vertex AI(Gemini) 및 OpenAI 호환 API(OpenAI, OpenRouter, Ollama 등)를 활용한 번역 및 문법 교정 데스크톱 앱.
-
-## 다운로드
-
-[최신 버전 릴리즈](https://github.com/Mistlud/gitworkspace_20260414/releases/latest)에서 `LLMTransTool-*-win.zip`을 받아 압축 해제 후 실행하세요. 현재 릴리즈 버전은 `v0.9.5`입니다.
 
 ## 개발 환경 실행
 
