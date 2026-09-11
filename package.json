@@ -1,6 +1,6 @@
 {
   "name": "llm-translation-app",
-  "version": "0.9.4",
+  "version": "0.9.5",
   "description": "Electron-based translation and proofreading app with Vertex AI and OpenAI-compatible provider support.",
   "main": "main.js",
   "scripts": {

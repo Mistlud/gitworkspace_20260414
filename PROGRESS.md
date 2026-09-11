@@ -228,6 +228,12 @@
 - Each source input is limited to 20,000 characters to keep the renderer responsive.
 - Manual UI testing completed: identical, partially different, fully different, option-toggle, copy, swap, navigation, shortcut, and existing-tab regression cases passed.
 
+### Translation Workflow Connection (2026-09-11)
+- Added exact character counts and estimated token counts below the translation input; the metrics update as the input changes, is cleared, is restored from a result, or is restored from history.
+- Added a `비교` action to translation and grammar results. It sends the source and result to the comparison tab, opens the tab, and immediately runs the local comparison.
+- Added `다시 편집` to the selected history entry. It restores the source, translation/grammar mode, and supported target language to the translation form, then clears the prior result for editing.
+- Manual UI testing completed: input metrics, result-to-comparison, history restoration, button visibility, and responsive layout cases passed.
+
 ### Vertex Model Registry & Thinking Level Settings (2026-09-09)
 - Vertex 모델 드롭다운의 하드코딩된 모델 목록을 등록형 목록으로 교체
   - 설정 탭에서 모델명 추가/삭제 가능, 선택 드롭다운에 즉시 동기화
