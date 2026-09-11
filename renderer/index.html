@@ -113,11 +113,13 @@
         <div class="panels">
           <div class="panel">
             <textarea id="inputText" placeholder="텍스트를 입력하세요..."></textarea>
+            <div class="input-metrics" id="inputMetrics">0자 · 예상 0토큰</div>
             <button class="clear-btn" id="clearInputBtn">지우기</button>
           </div>
           <button class="flip-btn" id="flipBtn" title="결과를 입력창으로">⇐</button>
           <div class="panel result-panel">
             <div id="resultText" class="result-text"></div>
+            <button class="compare-result-btn" id="compareResultBtn" style="display:none">비교</button>
             <button class="copy-btn" id="copyBtn" style="display:none">복사</button>
           </div>
         </div>
@@ -365,6 +367,7 @@
           <div class="history-pane">
             <div class="history-pane-label">결과</div>
             <div class="history-pane-text" id="historyResultPane"></div>
+            <button class="history-restore-btn" id="historyRestoreBtn" style="display:none">다시 편집</button>
             <button class="copy-btn" id="historyCopyBtn" style="display:none">복사</button>
           </div>
         </div>

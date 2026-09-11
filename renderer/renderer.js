@@ -42,15 +42,15 @@ window.addEventListener('DOMContentLoaded', async () => {
   // Tab switching
   document.querySelectorAll('.tab-btn').forEach((btn) => {
     btn.addEventListener('click', () => {
-      const target = btn.dataset.tab;
-      document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-      document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
-      btn.classList.add('active');
-      document.getElementById(`tab-${target}`).classList.add('active');
+      switchTab(btn.dataset.tab);
     });
   });
 
   setupComparisonTab();
+
+  const inputText = document.getElementById('inputText');
+  inputText.addEventListener('input', updateInputMetrics);
+  updateInputMetrics();
 
   // Pin (always on top)
   let isAlwaysOnTop = false;
@@ -310,6 +310,7 @@ window.addEventListener('DOMContentLoaded', async () => {
   // Clear input button
   document.getElementById('clearInputBtn').addEventListener('click', () => {
     document.getElementById('inputText').value = '';
+    updateInputMetrics();
   });
 
   // History clear button
@@ -335,6 +336,8 @@ window.addEventListener('DOMContentLoaded', async () => {
     });
   });
 
+  document.getElementById('historyRestoreBtn').addEventListener('click', restoreSelectedHistory);
+
   // Undo button
   document.getElementById('historyUndoBtn').addEventListener('click', () => {
     if (!lastDeleted) return;
@@ -349,6 +352,7 @@ window.addEventListener('DOMContentLoaded', async () => {
     const result = document.getElementById('resultText').textContent;
     if (!result) return;
     document.getElementById('inputText').value = result;
+    updateInputMetrics();
     clearResult();
   });
 
@@ -361,7 +365,21 @@ window.addEventListener('DOMContentLoaded', async () => {
       setTimeout(() => { btn.textContent = '복사'; }, 1500);
     });
   });
+
+  document.getElementById('compareResultBtn').addEventListener('click', sendResultToComparison);
 });
+
+function switchTab(target) {
+  document.querySelectorAll('.tab-btn').forEach((button) => {
+    button.classList.toggle('active', button.dataset.tab === target);
+  });
+  document.querySelectorAll('.tab-panel').forEach((panel) => panel.classList.remove('active'));
+  document.getElementById(`tab-${target}`).classList.add('active');
+}
+
+function updateInputMetrics() {
+  document.getElementById('inputMetrics').textContent = formatComparisonMetrics(document.getElementById('inputText').value);
+}
 
 function applyOpacity(value) {
   document.documentElement.style.setProperty('--bg-alpha', value);
@@ -616,6 +634,17 @@ function resetComparison() {
   document.querySelectorAll('.compare-options input').forEach((option) => { option.checked = false; });
   updateComparisonMetrics();
   clearComparisonResults('양쪽에 텍스트를 입력한 뒤 비교하세요.');
+}
+
+function sendResultToComparison() {
+  const input = document.getElementById('inputText').value;
+  const result = document.getElementById('resultText').textContent;
+  if (!input || !result) return;
+  document.getElementById('compareLeftInput').value = input;
+  document.getElementById('compareRightInput').value = result;
+  updateComparisonMetrics();
+  switchTab('tab4');
+  runComparison();
 }
 
 async function copyComparisonSource(input, buttonId) {
@@ -926,11 +955,13 @@ function showResult(text) {
   el.textContent = text;
   el.scrollTop = 0;
   document.getElementById('copyBtn').style.display = '';
+  document.getElementById('compareResultBtn').style.display = '';
 }
 
 function clearResult() {
   document.getElementById('resultText').textContent = '';
   document.getElementById('copyBtn').style.display = 'none';
+  document.getElementById('compareResultBtn').style.display = 'none';
 }
 
 function showSubmitConfirmModal() {
@@ -1193,6 +1224,7 @@ function renderHistory(selectedId) {
   history.forEach((item) => {
     const card = document.createElement('div');
     card.className = 'history-card' + (item.id === activeId ? ' selected' : '');
+    card.dataset.historyId = item.id;
 
     const langText = item.mode === 'translation'
       ? `→ ${item.targetLang}`
@@ -1252,6 +1284,22 @@ function setHistoryPanes(item) {
   document.getElementById('historyInputPane').textContent = item ? item.input : '';
   document.getElementById('historyResultPane').textContent = item ? item.result : '';
   document.getElementById('historyCopyBtn').style.display = item ? '' : 'none';
+  document.getElementById('historyRestoreBtn').style.display = item ? '' : 'none';
+}
+
+function restoreSelectedHistory() {
+  const selectedCard = document.querySelector('.history-card.selected');
+  const item = selectedCard && history.find((entry) => entry.id === Number(selectedCard.dataset.historyId));
+  if (!item) return;
+  currentMode = item.mode;
+  updateModeToggle();
+  document.getElementById('inputText').value = item.input;
+  if (item.mode === 'translation' && Array.from(document.getElementById('targetLang').options).some((option) => option.value === item.targetLang)) {
+    document.getElementById('targetLang').value = item.targetLang;
+  }
+  updateInputMetrics();
+  clearResult();
+  switchTab('translate');
 }
 
 function syncLangDropdowns() {

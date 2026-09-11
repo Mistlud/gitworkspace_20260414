@@ -382,7 +382,7 @@ textarea#inputText {
   font-size: 14px;
   line-height: 1.7;
   font-family: inherit;
-  padding: 16px;
+  padding: 16px 16px 44px;
   scrollbar-width: thin;
   scrollbar-color: #3a3a60 transparent;
 }
@@ -438,6 +438,37 @@ textarea#inputText::-webkit-scrollbar-thumb {
 }
 
 .clear-btn:hover {
+  background: #3a3a60;
+  color: #fff;
+}
+
+.input-metrics {
+  position: absolute;
+  bottom: 14px;
+  left: 16px;
+  color: #778;
+  font-size: 11px;
+  pointer-events: none;
+}
+
+.compare-result-btn,
+.history-restore-btn {
+  position: absolute;
+  bottom: 12px;
+  right: 78px;
+  padding: 5px 14px;
+  background: #2a2a45;
+  border: 1px solid #3a3a60;
+  border-radius: 6px;
+  color: #aaa;
+  font-size: 12px;
+  font-family: inherit;
+  cursor: pointer;
+  transition: background 0.15s, color 0.15s;
+}
+
+.compare-result-btn:hover,
+.history-restore-btn:hover {
   background: #3a3a60;
   color: #fff;
 }
@@ -1648,6 +1679,7 @@ textarea#inputText::-webkit-scrollbar-thumb {
   flex-direction: column;
   background: rgba(30, 30, 46, var(--bg-alpha));
   overflow: hidden;
+  position: relative;
 }
 
 .history-pane-label {
