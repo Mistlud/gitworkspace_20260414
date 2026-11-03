@@ -255,6 +255,16 @@
 - 기타 기능의 설정 설명에 Provider 관리, Vertex 모델 목록, Thinking Level, OpenAI Compatible 프로필, 온도 설정을 반영
 - 사용 방법 단계의 안내 문장을 별도 flex 요소로 구성하고, 앞의 강조 텍스트가 줄바꿈되지 않도록 레이아웃 보완
 
+### 창 제어 개선 (2026-11-03)
+
+- 사이드바 하단에 최소화(`−`) 버튼 추가. 위에서 아래로 고정 → 투명도 → 최소화 → 닫기 순서로 배치.
+- 최소화 버튼 클릭을 preload의 `minimizeWindow()`와 main의 `minimize-window` IPC에 연결하여 현재 창을 최소화.
+- 번역(`.control-bar`)·이력(`.history-header`)·비교(`.compare-toolbar`) 탭의 상단 표시줄을 창 드래그 영역으로 지정.
+- 표시줄 안의 버튼과 언어 선택 드롭다운은 `no-drag`로 제외하여 기존 조작 유지. 비교 옵션 줄과 본문은 드래그 영역에서 제외.
+- 로컬 `bak/node_modules`를 프로젝트 루트의 `node_modules`로 복원하고 `npm start`로 실행 확인.
+- 검증: `main.js`, `preload.js`, `renderer/renderer.js`의 `node --check` 및 `git diff --check` 통과. 사용자가 실제 앱에서 최소화와 세 탭 상단 표시줄 드래그 동작 확인 완료.
+- 패키지·lockfile·README의 배포 버전을 `v0.9.6`으로 갱신.
+
 ---
 
 ## Pending

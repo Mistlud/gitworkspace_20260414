@@ -23,6 +23,7 @@ contextBridge.exposeInMainWorld('api', {
   savePrompts: (data) => ipcRenderer.invoke('save-prompts', data),
 
   // Window
+  minimizeWindow: ()     => ipcRenderer.send('minimize-window'),
   closeWindow:    ()     => ipcRenderer.send('close-window'),
   setAlwaysOnTop: (flag) => ipcRenderer.send('set-always-on-top', flag),
   getOpacity:     ()     => ipcRenderer.invoke('get-opacity'),

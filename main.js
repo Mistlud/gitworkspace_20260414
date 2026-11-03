@@ -287,8 +287,6 @@ ipcMain.handle('send-to-llm', async (event, { systemPrompt, userMessage }) => {
   }
 });
 
-// (send-to-vertex 채널 제거됨 — renderer.js에서 send-to-llm 단일 채널 사용)
-
 // Always on top
 ipcMain.on('set-always-on-top', (event, flag) => {
   const win = BrowserWindow.fromWebContents(event.sender);
@@ -310,6 +308,12 @@ ipcMain.handle('save-opacity', async (event, opacity) => {
   } catch {
     return { success: false };
   }
+});
+
+// Minimize window
+ipcMain.on('minimize-window', (event) => {
+  const win = BrowserWindow.fromWebContents(event.sender);
+  if (win) win.minimize();
 });
 
 // Close window

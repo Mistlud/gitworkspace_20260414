@@ -103,7 +103,8 @@ html, body {
   background: #2e2e50;
 }
 
-.opacity-btn {
+.opacity-btn,
+.minimize-btn {
   -webkit-app-region: no-drag;
   width: 36px;
   height: 36px;
@@ -117,7 +118,8 @@ html, body {
   margin-bottom: 4px;
 }
 
-.opacity-btn:hover {
+.opacity-btn:hover,
+.minimize-btn:hover {
   background: #2a2a45;
   color: #aaa;
 }
@@ -206,6 +208,21 @@ html, body {
 
 .tab-panel.active {
   display: flex;
+}
+
+/* Window dragging from tab headers */
+.control-bar,
+.history-header,
+.compare-toolbar {
+  -webkit-app-region: drag;
+  user-select: none;
+}
+
+.control-bar button,
+.control-bar select,
+.history-header button,
+.compare-toolbar button {
+  -webkit-app-region: no-drag;
 }
 
 /* ── Tab 1: Translation ── */
@@ -727,13 +744,6 @@ textarea#inputText::-webkit-scrollbar-thumb {
   padding: 28px 32px;
   width: 100%;
   box-sizing: border-box;
-}
-
-.settings-wrap h2 {
-  font-size: 16px;
-  font-weight: 600;
-  color: #c0d0e8;
-  margin-bottom: 20px;
 }
 
 .settings-section {

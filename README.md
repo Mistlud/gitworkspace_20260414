@@ -2,7 +2,7 @@
 
 ## 다운로드
 
-[최신 버전 릴리즈](https://github.com/Mistlud/gitworkspace_20260414/releases/latest)에서 `LLMTransTool-*-win.zip`을 받아 압축 해제 후 실행하세요. 현재 릴리즈 버전은 `v0.9.5`입니다.
+[최신 버전 릴리즈](https://github.com/Mistlud/gitworkspace_20260414/releases/latest)에서 `LLMTransTool-*-win.zip`을 받아 압축 해제 후 실행하세요. 현재 릴리즈 버전은 `v0.9.6`입니다.
 
 ## 앱 소개
 
@@ -14,6 +14,8 @@ Google Vertex AI(Gemini) 및 OpenAI 호환 API(OpenAI, OpenRouter, Ollama 등)�
 - 이력: 최근 번역·교정 기록을 확인하고, 원문·모드·도착 언어를 복원해 다시 편집할 수 있습니다.
 - 비교: 두 텍스트 또는 번역·교정 결과를 로컬에서 나란히 비교하고 차이를 탐색할 수 있습니다.
 - Provider 설정: Vertex AI와 OpenAI 호환 API 프로필을 선택해 사용할 수 있습니다.
+
+Android 이식 준비 사항과 미결정 선택지는 [Android APK 제작 검토 문서](ANDROID_PREPARATION.md)에 정리되어 있습니다.
 
 ## 텍스트 비교
 
@@ -28,8 +30,10 @@ Google Vertex AI(Gemini) 및 OpenAI 호환 API(OpenAI, OpenRouter, Ollama 등)�
 
 ## 개발 환경 실행
 
+현재 로컬 작업 환경의 `node_modules`는 프로젝트 루트로 복원되어 있습니다. 의존성이 준비된 환경에서는 `npm start`로 실행합니다.
+
 ```bash
-npm install
+npm install # 최초 설치 또는 의존성 재설치 시
 npm start
 ```
 
@@ -51,9 +55,11 @@ gitworkspace_20260414/
 │   ├── index.html    # UI 구조
 │   ├── style.css     # 스타일
 │   └── renderer.js   # UI 로직
-├── PLAN.md           # 초기 설계 문서
-├── SubPLAN.md        # OpenAI Compatible 추가 설계 문서
-├── SubPLAN_260909.md # Vertex 모델 목록 및 Thinking Level 확장 계획
+├── node_modules/     # 개발·빌드 의존성 (Git 제외)
+├── bak/              # 로컬 백업 (Git 제외)
+│   ├── dist/         # 이전 배포본
+│   └── docs/         # 초기/추가 설계 문서 및 개인 작업 메모
+├── PRACTICAL_AUDIT.md # 실용 점검 및 정리 결과
 └── PROGRESS.md       # 진행 상황 및 참고 사항
 ```
 
@@ -138,11 +144,18 @@ gitworkspace_20260414/
 
 ## 사이드바 하단 버튼
 
+위에서 아래로 고정 → 투명도 → 최소화 → 닫기 순서로 배치되어 있습니다.
+
 | 버튼 | 기능 |
 |---|---|
 | `📌` | 창 항상 위 고정 토글 (활성 시 파란색) |
 | `🔆` | 투명도 슬라이더 팝오버 열기 (20~100%, 실시간 반영) |
+| `−` | 현재 창 최소화 (툴팁: 최소화) |
 | `✕` | 앱 종료 확인 모달 표시 |
+
+## 창 이동
+
+사이드바 또는 번역·이력·비교 탭의 상단 표시줄을 드래그하면 창을 이동할 수 있습니다. 상단 표시줄 안의 버튼과 언어 선택 드롭다운은 클릭·선택 동작을 그대로 유지합니다. 비교 옵션 줄과 본문은 드래그 영역에 포함되지 않습니다.
 
 ## 뒤집기 버튼
 

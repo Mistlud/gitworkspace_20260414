@@ -99,6 +99,11 @@ window.addEventListener('DOMContentLoaded', async () => {
     }
   });
 
+  // Minimize button
+  document.getElementById('minimizeBtn').addEventListener('click', () => {
+    window.api.minimizeWindow();
+  });
+
   // Close button
   document.getElementById('closeBtn').addEventListener('click', () => {
     showConfirmModal(() => window.api.closeWindow());
